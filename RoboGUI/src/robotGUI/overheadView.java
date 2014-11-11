@@ -2,6 +2,8 @@ package robotGUI;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -9,13 +11,22 @@ import javax.swing.SwingUtilities;
 public class overheadView extends JPanel {
 	private void doDrawing(Graphics g) {
 
+		int rows = 20;
+		int cols=20;
+		int rowSpace = this.getHeight()/rows;
+		int colSpace = this.getWidth()/cols;
+		
         Graphics2D g2d = (Graphics2D) g;
 
-        g2d.drawLine(30, 30, 200, 30);
-        g2d.drawLine(200, 30, 30, 200);
-        g2d.drawLine(30, 200, 200, 200);
-        g2d.drawLine(200, 200, 30, 30);
-
+        int x,y;
+        for (int r=0;r<=rows;r++){
+        	y=r*rowSpace;
+        	g2d.drawLine(0, y, this.getWidth(),y);
+        }
+        for (int c=0;c<=cols;c++){
+        	x=c*colSpace;
+        	g2d.drawLine(x, 0, x, this.getHeight());
+        }
    } 
 	
 	@Override

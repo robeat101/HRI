@@ -69,7 +69,7 @@ public class MainWindow{
 		chckbxControlSomething = new JCheckBox("Control Something");
 		frame.getContentPane().add(chckbxControlSomething, BorderLayout.WEST);
 		
-		overheadViewPanel = new JPanel();
+		overheadViewPanel = new overheadView();
 		overheadViewPanel.setBackground(Color.BLACK);
 		frame.getContentPane().add(overheadViewPanel, BorderLayout.CENTER);
 	}
