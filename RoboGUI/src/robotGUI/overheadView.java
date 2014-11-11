@@ -1,3 +1,8 @@
+/**
+ * This class is the main JPanel in which robot world and all its contents are rendered.
+ * it gives and overhead view of the domain space and the tasks and agents in it.
+ */
+
 package robotGUI;
 
 import java.awt.Graphics;

@@ -1,3 +1,8 @@
+/**
+ * This is a representation of a robot.
+ * It records the current position and orientation of the robot (state), as well as some behavior parameters.
+ */
+
 package robotGUI;
 
 import java.awt.Point;
