@@ -60,4 +60,9 @@ public class Robot {
 							* Math.cos(Math.toRadians(theta)));
 		}
 	}
+	
+	
+	public void updateRobot(){
+		//TODO: Check desired direction and move. 
+	}
 }
