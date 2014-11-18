@@ -10,7 +10,10 @@ import java.awt.Point;
 import robotExceptions.InvalidHeadingException;
 import robotGenericValues.StandardValues;
 import robotGenericValues.direction;
+
 import java.lang.Math;
+
+import com.ibm.icu.math.MathContext;
 
 public class Robot {
 	// position, orientation
@@ -40,12 +43,12 @@ public class Robot {
 			throw new InvalidHeadingException("Cannot move robot when theta is " + theta + "."); 
 		}
 		else if(moveDirection == direction.FORWARD){
-			this.pos.y = this.pos.y + (int) Math.round(StandardValues.DELTA_POS * Math.sin(theta));
-			this.pos.x = this.pos.x + (int) Math.round(StandardValues.DELTA_POS * Math.cos(theta));
+			this.pos.y = this.pos.y + (int) Math.round(StandardValues.DELTA_POS * Math.sin(Math.toRadians(theta)));
+			this.pos.x = this.pos.x + (int) Math.round(StandardValues.DELTA_POS * Math.cos(Math.toRadians(theta)));
 		}
 		else if(moveDirection == direction.BACKWARD){
-			this.pos.y = this.pos.y - (int) Math.round(StandardValues.DELTA_POS * Math.sin(theta));
-			this.pos.x = this.pos.x - (int) Math.round(StandardValues.DELTA_POS * Math.cos(theta));
+			this.pos.y = this.pos.y - (int) Math.round(StandardValues.DELTA_POS * Math.sin(Math.toRadians(theta)));
+			this.pos.x = this.pos.x - (int) Math.round(StandardValues.DELTA_POS * Math.cos(Math.toRadians(theta)));
 		}
 		
 	}
