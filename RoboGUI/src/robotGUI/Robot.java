@@ -13,12 +13,10 @@ import robotGenericValues.direction;
 
 import java.lang.Math;
 
-import com.ibm.icu.math.MathContext;
-
 public class Robot {
 	// position, orientation
 	private Point	pos;
-	private int	theta;
+	private int		theta;
 
 	// behavior
 	private float	intelligence;
@@ -28,31 +26,38 @@ public class Robot {
 
 	public void turnRobot(direction turnDirection)
 	{
-		if(turnDirection == direction.LEFT){
+		if (turnDirection == direction.LEFT)
+		{
 			this.theta = this.theta + StandardValues.DELTA_THETA;
-		}
-		else if (turnDirection == direction.RIGHT) {
+		} else if (turnDirection == direction.RIGHT)
+		{
 			this.theta = this.theta - StandardValues.DELTA_THETA;
 		}
 	}
-	
-	public void moveRobot(direction moveDirection) throws InvalidHeadingException
-	{
-		if(theta % StandardValues.VALID_HEADING_STEP != 0)
-		{
-			throw new InvalidHeadingException("Cannot move robot when theta is " + theta + "."); 
-		}
-		else if(moveDirection == direction.FORWARD){
-			this.pos.y = this.pos.y + (int) Math.round(StandardValues.DELTA_POS * Math.sin(Math.toRadians(theta)));
-			this.pos.x = this.pos.x + (int) Math.round(StandardValues.DELTA_POS * Math.cos(Math.toRadians(theta)));
-		}
-		else if(moveDirection == direction.BACKWARD){
-			this.pos.y = this.pos.y - (int) Math.round(StandardValues.DELTA_POS * Math.sin(Math.toRadians(theta)));
-			this.pos.x = this.pos.x - (int) Math.round(StandardValues.DELTA_POS * Math.cos(Math.toRadians(theta)));
-		}
-		
-	}
-	
 
-	
+	public void moveRobot(direction moveDirection)
+			throws InvalidHeadingException
+	{
+		if (theta % StandardValues.VALID_HEADING_STEP != 0)
+		{
+			throw new InvalidHeadingException(
+					"Cannot move robot when theta is " + theta + ".");
+		} else if (moveDirection == direction.FORWARD)
+		{
+			this.pos.y = this.pos.y
+					+ (int) Math.round(StandardValues.DELTA_POS
+							* Math.sin(Math.toRadians(theta)));
+			this.pos.x = this.pos.x
+					+ (int) Math.round(StandardValues.DELTA_POS
+							* Math.cos(Math.toRadians(theta)));
+		} else if (moveDirection == direction.BACKWARD)
+		{
+			this.pos.y = this.pos.y
+					- (int) Math.round(StandardValues.DELTA_POS
+							* Math.sin(Math.toRadians(theta)));
+			this.pos.x = this.pos.x
+					- (int) Math.round(StandardValues.DELTA_POS
+							* Math.cos(Math.toRadians(theta)));
+		}
+	}
 }
