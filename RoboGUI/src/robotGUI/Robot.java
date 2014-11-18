@@ -7,6 +7,7 @@ package robotGUI;
 
 import java.awt.Point;
 
+import robotExceptions.InvalidHeadingException;
 import robotGenericValues.StandardValues;
 import robotGenericValues.direction;
 
@@ -32,11 +33,11 @@ public class Robot {
 		}
 	}
 	
-	public void moveRobot(direction moveDirection)
+	public void moveRobot(direction moveDirection) throws InvalidHeadingException
 	{
 		if(theta % 0.25 != 0)
 		{
-			//TODO: Add exception
+			throw new InvalidHeadingException("Cannot move robot when theta is " + theta + "."); 
 		}
 		else if(moveDirection == direction.FORWARD){
 			//TODO: Add movement
