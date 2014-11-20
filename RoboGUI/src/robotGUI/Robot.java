@@ -9,7 +9,7 @@ import java.awt.Point;
 
 import robotExceptions.InvalidHeadingException;
 import robotGenericValues.StandardValues;
-import robotGenericValues.direction;
+import robotGenericValues.status;
 
 import java.lang.Math;
 
@@ -23,26 +23,30 @@ public class Robot {
 
 	// goals
 	private Point	curGoal;
+	private Point [] path;
+	
+	//status
+	private status robotStatus;
 
-	public void turnRobot(direction turnDirection)
+	public void turnRobot(status turnStatus)
 	{
-		if (turnDirection == direction.LEFT)
+		if (turnStatus == status.LEFT)
 		{
 			this.theta = this.theta + StandardValues.DELTA_THETA;
-		} else if (turnDirection == direction.RIGHT)
+		} else if (turnStatus == status.RIGHT)
 		{
 			this.theta = this.theta - StandardValues.DELTA_THETA;
 		}
 	}
 
-	public void moveRobot(direction moveDirection)
+	public void moveRobot(status moveStatus)
 			throws InvalidHeadingException
 	{
 		if (theta % StandardValues.VALID_HEADING_STEP != 0)
 		{
 			throw new InvalidHeadingException(
 					"Cannot move robot when theta is " + theta + ".");
-		} else if (moveDirection == direction.FORWARD)
+		} else if (moveStatus == status.FORWARD)
 		{
 			this.pos.y = this.pos.y
 					+ (int) Math.round(StandardValues.DELTA_POS
@@ -50,7 +54,7 @@ public class Robot {
 			this.pos.x = this.pos.x
 					+ (int) Math.round(StandardValues.DELTA_POS
 							* Math.cos(Math.toRadians(theta)));
-		} else if (moveDirection == direction.BACKWARD)
+		} else if (moveStatus == status.BACKWARD)
 		{
 			this.pos.y = this.pos.y
 					- (int) Math.round(StandardValues.DELTA_POS
@@ -63,6 +67,23 @@ public class Robot {
 	
 	
 	public void updateRobot(){
-		//TODO: Check desired direction and move. 
+
+		if(robotStatus == status.FORWARD || robotStatus == status.BACKWARD) {
+			try {
+				moveRobot(robotStatus);
+			} catch (InvalidHeadingException e) {
+				e.printStackTrace();
+			}
+		}
+		else if (robotStatus == status.LEFT || robotStatus == status.RIGHT)
+		{
+			turnRobot(robotStatus);
+		}
+		else if(robotStatus == status.WAITING)
+		{
+			//TODO: Call check next step function
+		}
+
+
 	}
 }
