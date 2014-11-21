@@ -13,9 +13,8 @@ import robotGenericValues.status;
 
 import java.lang.Math;
 
-public class Robot {
+public class Robot extends Occupant{
 	// position, orientation
-	private Point	pos;
 	private int		theta;
 
 	// behavior
@@ -29,7 +28,7 @@ public class Robot {
 	private status robotStatus;
 
 	public Robot(Point pos, int theta, Point curGoal, float intelligence) {
-		this.pos = pos;
+		super(pos);
 		this.theta = theta;
 		this.curGoal = curGoal;
 		this.intelligence = intelligence;
@@ -55,20 +54,20 @@ public class Robot {
 					"Cannot move robot when theta is " + theta + ".");
 		} else if (moveStatus == status.FORWARD)
 		{
-			this.pos.y = this.pos.y
+			this.pos.setRow(this.pos.getRow()
 					+ (int) Math.round(StandardValues.DELTA_POS
-							* Math.sin(Math.toRadians(theta)));
-			this.pos.x = this.pos.x
+							* Math.sin(Math.toRadians(theta))));
+			this.pos.setCol(this.pos.getCol()
 					+ (int) Math.round(StandardValues.DELTA_POS
-							* Math.cos(Math.toRadians(theta)));
+							* Math.cos(Math.toRadians(theta))));
 		} else if (moveStatus == status.BACKWARD)
 		{
-			this.pos.y = this.pos.y
+			this.pos.setRow(this.pos.getRow()
 					- (int) Math.round(StandardValues.DELTA_POS
-							* Math.sin(Math.toRadians(theta)));
-			this.pos.x = this.pos.x
+							* Math.sin(Math.toRadians(theta))));
+			this.pos.setCol(this.pos.getCol()
 					- (int) Math.round(StandardValues.DELTA_POS
-							* Math.cos(Math.toRadians(theta)));
+							* Math.cos(Math.toRadians(theta))));
 		}
 	}
 	

@@ -14,25 +14,42 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 public class overheadView extends JPanel {
+	private int rows;
+	private int cols;
+	private int rowSpace;
+	private int colSpace;
+	Graphics2D g2d;
+	 
+	RobotWorld world;
+	
+	public overheadView(){
+		rows=20;
+		cols=20;
+        
+		world = new RobotWorld(rows, cols);
+	}
+	
 	private void doDrawing(Graphics g) {
-
-		int rows = 20;
-		int cols=20;
-		int rowSpace = this.getHeight()/rows;
-		int colSpace = this.getWidth()/cols;
+		g2d = (Graphics2D) g;
+		rowSpace = this.getHeight()/rows;
+		colSpace = this.getWidth()/cols;
 		
-        Graphics2D g2d = (Graphics2D) g;
-
-        int x,y;
-        for (int r=0;r<=rows;r++){
+		//draw robots
+        drawGrid(g2d);	//draw grid
+   } 
+	
+	private void drawGrid(Graphics2D g2d){
+        int y;
+		for (int r=0;r<=rows;r++){
         	y=r*rowSpace;
         	g2d.drawLine(0, y, this.getWidth(),y);
         }
+		int x;
         for (int c=0;c<=cols;c++){
         	x=c*colSpace;
         	g2d.drawLine(x, 0, x, this.getHeight());
         }
-   } 
+	}
 	
 	@Override
     public void paintComponent(Graphics g) {

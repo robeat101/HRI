@@ -74,8 +74,4 @@ public class MainWindow{
 		frame.getContentPane().add(overheadViewPanel, BorderLayout.CENTER);
 	}
 	
-	void setupMainWindow(){
-	
-	}
-
 }
