@@ -28,6 +28,13 @@ public class Robot {
 	//status
 	private status robotStatus;
 
+	public Robot(Point pos, int theta, Point curGoal, float intelligence) {
+		this.pos = pos;
+		this.theta = theta;
+		this.curGoal = curGoal;
+		this.intelligence = intelligence;
+	}
+
 	public void turnRobot(status turnStatus)
 	{
 		if (turnStatus == status.LEFT)
