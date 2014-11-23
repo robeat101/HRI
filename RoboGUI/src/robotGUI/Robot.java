@@ -50,17 +50,7 @@ public class Robot extends Occupant{
 		
 		System.out.println("Making new robot with position ("+pos.getX()+","+pos.getY()+") theta = "+theta + " intelligence="+intelligence+".");
 		
-		ImageIcon icon = null;
-		try{
-			icon = new ImageIcon("C:/Users/Dan/Documents/CLASSWORK/Nick MQP/EclipseWorkspace/HRI/RoboGUI/resources/sea-turtle.png");
-			img = new TransparentRotatedImage(icon.getImage());
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		System.out.println("icon: "+icon.toString());
-		System.out.println("image: "+img.toString());
-		System.out.println("panel: " + panel.toString());
-		panel.add(img);
+		
 		
 		//TODO: image seems fine - why is the JPanel null??????!!!
 	}
@@ -126,7 +116,7 @@ public class Robot extends Occupant{
 		int yPos = 10;
 		System.out.println("\tDrawing Robot at ("+xPos+","+yPos+","+theta+")");
 		//super.paint(g);
-		img.paintComponent(g);
+		//img.paintComponent(g);
 		
 		/*
 		Graphics2D g2d = (Graphics2D)g;
