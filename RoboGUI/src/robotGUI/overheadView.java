@@ -11,9 +11,15 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -34,8 +40,9 @@ public class overheadView extends JPanel {
     private Timer timer = new Timer(20, new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent ae) {
-        	angle+=0.005;
-        	rerotate();
+        	
+        	angle+=0.1;
+
         	repaint();
         }
     });
@@ -46,7 +53,11 @@ public class overheadView extends JPanel {
         
 		world = new RobotWorld(rows, cols, this);
 		
-		transformedImage = getImage();
+		try{
+			transformedImage =  ImageIO.read(new File("images/turtle.png"));//getImage();
+		}catch(IOException e){
+			System.out.println("Exception reading image file");
+		}
 		timer.start();
 	}
 	
@@ -86,7 +97,7 @@ public class overheadView extends JPanel {
 		newImgG2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		newImgG2d.translate((neww-w)/2,(newh-h)/2);
 		newImgG2d.rotate(angle, w/2, h/2);
-		newImgG2d.drawRenderedImage(transformedImage,  null);
+		//newImgG2d.drawRenderedImage(transformedImage,  null);
 		transformedImage = rotatedimg;
 		newImgG2d.dispose();
 	}
@@ -100,13 +111,28 @@ public class overheadView extends JPanel {
 		return img;
 	}
 	
+	private BufferedImage rotate(BufferedImage bi, float angle){
+		AffineTransform at = new AffineTransform();
+		//at.translate(-bi.getWidth()/2, -bi.getHeight()/2);
+		at.rotate(angle, bi.getWidth()/2.0, bi.getHeight()/2.0);
+		BufferedImageOp op = new AffineTransformOp(at, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+		return op.filter(bi, null);
+	}
+	
 	@Override
     public void paintComponent(Graphics g) {
         
         super.paintComponent(g);
         
-        g.drawImage(transformedImage, 10, 400, null);
+
+        //Graphics2D imgg = (Graphics2D)transformedImage.getGraphics();
+        //imgg.rotate(angle, 26,26);
+        //imgg.drawImage(transformedImage, 0, 0, null);
+        //imgg.dispose();
         
         doDrawing(g);
+        
+        g.drawImage(rotate(transformedImage, angle), 10, 400, null);
+
     }    
 }
