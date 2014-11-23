@@ -4,6 +4,8 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.util.Random;
 
+import javax.swing.JPanel;
+
 public class RobotWorld {
 
 	private int nRobots;
@@ -14,17 +16,24 @@ public class RobotWorld {
 	
 	Occupant grid[][];
 	
-	public RobotWorld(int r, int c){
+	private JPanel renderPanel;
+	
+	public RobotWorld(int r, int c, JPanel panel){
 		rows=r;
 		cols=c;
+		
+		System.out.println("Making RobotWorld " + panel.toString());
 		
 		grid = new Occupant[cols][rows];
 		
 		//make a bunch of robots
+		nRobots = 10;
 		robots = new Robot[nRobots];
 		for (int i=0;i<nRobots;i++){
 			robots[i] = makeRandomRobot();
 		}
+		
+		renderPanel = panel;
 	}
 	
 	private Robot makeRandomRobot(){
@@ -40,7 +49,7 @@ public class RobotWorld {
 		
 		Cell goal = getRadomUnoccupiedCell();
 		
-		return new Robot(randPos.toPoint(),theta, goal.toPoint(), intelligence);
+		return new Robot(randPos.toPoint(),theta, goal.toPoint(), intelligence, renderPanel);
 	}
 	
 	Occupant getOccupant(Cell c){
@@ -76,8 +85,15 @@ public class RobotWorld {
 	}
 	
 	public void draw(Graphics g){
-		
-		
+		System.out.println("Drawing Robot world...");
+		drawRobots(g);
+	}
+	
+	private void drawRobots(Graphics g){
+		System.out.println("\tDrawing robots...");
+		for (int i=0;i<nRobots;i++){
+			robots[i].draw(g);
+		}
 	}
 
 }

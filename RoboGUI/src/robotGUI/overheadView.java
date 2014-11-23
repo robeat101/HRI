@@ -26,7 +26,7 @@ public class overheadView extends JPanel {
 		rows=20;
 		cols=20;
         
-		world = new RobotWorld(rows, cols);
+		world = new RobotWorld(rows, cols, this);
 	}
 	
 	private void doDrawing(Graphics g) {
@@ -40,9 +40,7 @@ public class overheadView extends JPanel {
         //draw RobotWorld
         world.draw(g);
    } 
-	
-
-	
+		
 	private void drawGrid(Graphics2D g2d){
         int y;
 		for (int r=0;r<=rows;r++){

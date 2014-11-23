@@ -71,6 +71,7 @@ public class MainWindow{
 		
 		overheadViewPanel = new overheadView();
 		overheadViewPanel.setBackground(Color.BLACK);
+		//overheadViewPanel.setOpaque(true);
 		frame.getContentPane().add(overheadViewPanel, BorderLayout.CENTER);
 	}
 	

@@ -5,9 +5,13 @@
 
 package robotGUI;
 
+import java.awt.AlphaComposite;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 
 import robotExceptions.InvalidHeadingException;
 import robotGenericValues.StandardValues;
@@ -16,6 +20,10 @@ import robotGenericValues.status;
 import java.io.File;
 import java.io.IOException;
 import java.lang.Math;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JPanel;
 
 public class Robot extends Occupant{
 	// position, orientation
@@ -32,19 +40,29 @@ public class Robot extends Occupant{
 	private status robotStatus;
 
 	//rendering
-	Image img;
+	TransparentRotatedImage img;
 	
-	public Robot(Point pos, int theta, Point curGoal, float intelligence) {
+	public Robot(Point pos, int theta, Point curGoal, float intelligence, JPanel panel) {
 		super(pos);
 		this.theta = theta;
 		this.curGoal = curGoal;
 		this.intelligence = intelligence;
 		
+		System.out.println("Making new robot with position ("+pos.getX()+","+pos.getY()+") theta = "+theta + " intelligence="+intelligence+".");
+		
+		ImageIcon icon = null;
 		try{
-			this.img = new Image("robot.jpg", true);
-		}catch(IOException e){
-			System.out.println("Robot failed to load its image!");
+			icon = new ImageIcon("C:/Users/Dan/Documents/CLASSWORK/Nick MQP/EclipseWorkspace/HRI/RoboGUI/resources/sea-turtle.png");
+			img = new TransparentRotatedImage(icon.getImage());
+		}catch(Exception e){
+			e.printStackTrace();
 		}
+		System.out.println("icon: "+icon.toString());
+		System.out.println("image: "+img.toString());
+		System.out.println("panel: " + panel.toString());
+		panel.add(img);
+		
+		//TODO: image seems fine - why is the JPanel null??????!!!
 	}
 
 	public void turnRobot(status turnStatus)
@@ -103,9 +121,23 @@ public class Robot extends Occupant{
 		}
 	}
 
-	public void paint(Graphics g){
+	public void draw(Graphics g){
+		int xPos = 10;
+		int yPos = 10;
+		System.out.println("\tDrawing Robot at ("+xPos+","+yPos+","+theta+")");
+		//super.paint(g);
+		img.paintComponent(g);
+		
+		/*
+		Graphics2D g2d = (Graphics2D)g;
+		g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+		g2d.rotate(theta*Math.PI/180, getWidth()/2, getHeight()/2);
+		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+		
 		int x = this.pos.getCol();
 		int y = this.pos.getRow();
-		g.drawImage(img, x, y);
+		g.drawImage(img.get, xPos, yPos, null);
+		*/
 	}
+	
 }
