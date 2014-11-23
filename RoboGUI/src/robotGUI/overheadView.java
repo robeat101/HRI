@@ -12,10 +12,13 @@ import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
+import java.awt.event.ActionEvent;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.swing.AbstractAction;
 
 public class overheadView extends JPanel {
 	private int rows;
@@ -27,7 +30,16 @@ public class overheadView extends JPanel {
 	RobotWorld world;
 	
 	BufferedImage transformedImage;
-	
+	float angle = 0;
+    private Timer timer = new Timer(20, new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+        	angle+=0.005;
+        	rerotate();
+        	repaint();
+        }
+    });
+    
 	public overheadView(){
 		rows=20;
 		cols=20;
@@ -35,6 +47,7 @@ public class overheadView extends JPanel {
 		world = new RobotWorld(rows, cols, this);
 		
 		transformedImage = getImage();
+		timer.start();
 	}
 	
 	private void doDrawing(Graphics g) {
@@ -62,25 +75,29 @@ public class overheadView extends JPanel {
         }
 	}
 	
-	private BufferedImage getImage(){
-		BufferedImage img = new BufferedImage(100,100, BufferedImage.TRANSLUCENT);
-		Graphics2D imgg2d = img.createGraphics();
-		imgg2d.setColor(Color.GREEN);
-		imgg2d.fillRect(0, 0, img.getWidth(), img.getHeight());
-		imgg2d.dispose();
-		
-		double angle = Math.PI/4.0;
+	
+	private void rerotate(){
+		System.out.println("Rotation angle: " + angle+".");
 		double sin=Math.abs(Math.sin(angle)), cos=Math.abs(Math.cos(angle));
-		int w = img.getWidth(), h = img.getHeight();
+		int w = transformedImage.getWidth(), h = transformedImage.getHeight();
 		int neww = (int)Math.floor(w*cos+h*sin), newh=(int)Math.floor(h*cos+w*sin);
 		BufferedImage rotatedimg = new BufferedImage(neww, newh, Transparency.TRANSLUCENT);
 		Graphics2D newImgG2d = rotatedimg.createGraphics();
 		newImgG2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		newImgG2d.translate((neww-w)/2,(newh-h)/2);
 		newImgG2d.rotate(angle, w/2, h/2);
-		newImgG2d.drawRenderedImage(img,  null);
+		newImgG2d.drawRenderedImage(transformedImage,  null);
+		transformedImage = rotatedimg;
 		newImgG2d.dispose();
-		return rotatedimg;
+	}
+	
+	private BufferedImage getImage(){
+		BufferedImage img = new BufferedImage(100,100, BufferedImage.TRANSLUCENT);
+		Graphics2D imgg2d = img.createGraphics();
+		imgg2d.setColor(Color.GREEN);
+		imgg2d.fillRect(0, 0, img.getWidth(), img.getHeight());
+		imgg2d.dispose();
+		return img;
 	}
 	
 	@Override
