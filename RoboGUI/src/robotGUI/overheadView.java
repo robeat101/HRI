@@ -34,9 +34,14 @@ public class overheadView extends JPanel {
 		rowSpace = this.getHeight()/rows;
 		colSpace = this.getWidth()/cols;
 		
-		//draw robots
+		//draw grid
         drawGrid(g2d);	//draw grid
+        
+        //draw RobotWorld
+        world.draw(g);
    } 
+	
+
 	
 	private void drawGrid(Graphics2D g2d){
         int y;

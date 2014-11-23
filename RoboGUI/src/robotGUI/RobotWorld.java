@@ -1,5 +1,6 @@
 package robotGUI;
 
+import java.awt.Graphics;
 import java.awt.Point;
 import java.util.Random;
 
@@ -57,7 +58,6 @@ public class RobotWorld {
 		return rows;
 	}
 	
-	
 	/**
 	 * Returns a random unoccupied point
 	 */
@@ -68,10 +68,16 @@ public class RobotWorld {
 		int robotCol = rn.nextInt(cols);
 		int robotRow = rn.nextInt(rows);
 		while (occupied(new Cell(robotCol, robotRow))){
-			int robotX = rn.nextInt(cols);
-			int robotY = rn.nextInt(rows);
+			robotCol = rn.nextInt(cols);
+			robotRow = rn.nextInt(rows);
 		}
 		
 		return new Cell(robotCol, robotRow);
 	}
+	
+	public void draw(Graphics g){
+		
+		
+	}
+
 }

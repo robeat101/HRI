@@ -5,12 +5,16 @@
 
 package robotGUI;
 
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Point;
 
 import robotExceptions.InvalidHeadingException;
 import robotGenericValues.StandardValues;
 import robotGenericValues.status;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.Math;
 
 public class Robot extends Occupant{
@@ -27,11 +31,20 @@ public class Robot extends Occupant{
 	//status
 	private status robotStatus;
 
+	//rendering
+	Image img;
+	
 	public Robot(Point pos, int theta, Point curGoal, float intelligence) {
 		super(pos);
 		this.theta = theta;
 		this.curGoal = curGoal;
 		this.intelligence = intelligence;
+		
+		try{
+			this.img = new Image("robot.jpg", true);
+		}catch(IOException e){
+			System.out.println("Robot failed to load its image!");
+		}
 	}
 
 	public void turnRobot(status turnStatus)
@@ -71,7 +84,6 @@ public class Robot extends Occupant{
 		}
 	}
 	
-	
 	public void updateRobot(){
 
 		if(robotStatus == status.FORWARD || robotStatus == status.BACKWARD) {
@@ -89,7 +101,11 @@ public class Robot extends Occupant{
 		{
 			//TODO: Call check next step function
 		}
+	}
 
-
+	public void paint(Graphics g){
+		int x = this.pos.getCol();
+		int y = this.pos.getRow();
+		g.drawImage(img, x, y);
 	}
 }
