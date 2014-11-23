@@ -16,3 +16,12 @@ hs_err_pid*
 *.iml
 *.classpath
 *.classpath
+
+#Eclipse#
+###################
+*.classpath
+*.project
+
+# Package Files #
+##################
+*.jar
