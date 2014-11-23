@@ -123,12 +123,7 @@ public class overheadView extends JPanel {
     public void paintComponent(Graphics g) {
         
         super.paintComponent(g);
-        
 
-        //Graphics2D imgg = (Graphics2D)transformedImage.getGraphics();
-        //imgg.rotate(angle, 26,26);
-        //imgg.drawImage(transformedImage, 0, 0, null);
-        //imgg.dispose();
         
         doDrawing(g);
         
