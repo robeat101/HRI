@@ -5,6 +5,8 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.Random;
 
+import robotGenericValues.StandardValues;
+
 public class RobotWorld {
 
 	//robots
@@ -29,7 +31,7 @@ public class RobotWorld {
 		cols=c;
 		colSpace = (float)WIDTH/(float)rows;
 		rowSpace = (float)HEIGHT/(float)cols;
-		System.out.println("Making RobotWorld...");
+		System.out.println("Making RobotWorld of "+cols+"X"+rows+" cells each size "+colSpace+"x"+rowSpace+".");
 		
 		//make robots and add them to the grid
 		grid = new Occupant[cols][rows];
@@ -43,36 +45,36 @@ public class RobotWorld {
 	
 	private void makeRobots(){
 		//make a bunch of robots
-		nRobots = 10;
+		nRobots = 2;
 		robots = new Robot[nRobots];
 		for (int i=0;i<nRobots;i++){
-			robots[i] = makeRandomRobot();
+			robots[i] = makeRandomRobot(i);
 		}
 	}
 	
 	public void update(){
-		System.out.println("\tUPDATE ROBOT WORLD...");
+//		System.out.println("\tUPDATE ROBOT WORLD...");
 		//update robots
 		updateRobots();
 	}
 	
 	private void updateRobots(){
-		System.out.println("\t\tUpdate robots...");
+//		System.out.println("\t\tUpdate robots...");
 		for (int i=0;i<nRobots;i++){
 			robots[i].updateRobot(this);
 		}
 	}
 	
-	private Robot makeRandomRobot(){
+	private Robot makeRandomRobot(int id){
 		Random rn = new Random();
 		
 		Cell randPos = getRadomUnoccupiedCell();	//make a random unoccupied position
 		float intelligence = rn.nextFloat();		//make a random intelligence
-		int theta = rn.nextInt(360);				//make a random rotation theta
+		int theta = rn.nextInt(3)*StandardValues.VALID_HEADING_STEP;				//make a random rotation theta
 		Cell goal = getRadomUnoccupiedCell();		//make a random goal
 		
 		//create the robot
-		Robot robot =  new Robot(randPos,theta, goal, intelligence, this);
+		Robot robot =  new Robot(randPos,theta, goal, intelligence, id, this);
 		
 		// add the robot as the occupant of its own grid cell
 		grid[randPos.getCol()][randPos.getRow()] = robot;
@@ -120,7 +122,7 @@ public class RobotWorld {
 	}
 	
 	public void draw(Graphics g){
-		System.out.println("Drawing Robot world...");
+//		System.out.println("Drawing Robot world...");
 		drawGrid((Graphics2D)g);
 		drawRobots(g);
 	}
@@ -139,7 +141,7 @@ public class RobotWorld {
 	}
 	
 	private void drawRobots(Graphics g){
-		System.out.println("\tDrawing robots...");
+//		System.out.println("\tDrawing robots...");
 		for (int i=0;i<nRobots;i++){
 			robots[i].draw(g);
 		}

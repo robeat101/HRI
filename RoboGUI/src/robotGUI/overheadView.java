@@ -32,33 +32,24 @@ public class overheadView extends JPanel {
 	Graphics2D g2d;
 	 
 	RobotWorld world;
-
-    private Timer timer = new Timer(20, new AbstractAction() {
-        @Override
-        public void actionPerformed(ActionEvent ae) {
-        	System.out.println("UPDATE SIMULATION:");
-        	world.update();        	
-        	
-        	repaint();
-        }
-    });
+    
+    public void update(){
+    	world.update();        	
+    	repaint();
+    }
     
 	public overheadView(){
-		int width = 100;
-		int height = 100;
-		
+		int width = 800;
+		int height = 800;
 		this.setPreferredSize(new Dimension(width,height));
 		world = new RobotWorld(width, height);
-		timer.start();
 	}
 	
 	private void doDrawing(Graphics g) {
         
         //draw RobotWorld
         world.draw(g);
-   } 
-		
-
+	} 
 	
 	@Override
     public void paintComponent(Graphics g) {

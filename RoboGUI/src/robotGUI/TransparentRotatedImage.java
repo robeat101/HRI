@@ -18,8 +18,8 @@ public class TransparentRotatedImage extends JPanel {
     private AffineTransform curTransform;
     private Point renderPosition;
     
-    public TransparentRotatedImage(Image image, double rot, Point position) {
-        this.image = image;
+    public TransparentRotatedImage(Image image, Dimension d, int rot, Point position) {
+        this.image = image.getScaledInstance(d.width,d.height, Image.SCALE_SMOOTH);
         setOpaque(false);
         rotation = rot;
         renderPosition = position;
@@ -30,22 +30,24 @@ public class TransparentRotatedImage extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
-        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
-        g2.setColor(new Color(0, 0, 200, 90));
-        g2.fillRect(0, 0, getWidth(), getHeight());
+        //g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+        //g2.setColor(new Color(0, 0, 200, 90));
+        //g2.fillRect(0, 0, getWidth(), getHeight());
         g2.setTransform(curTransform);
-        g2.drawImage(image, renderPosition.x, renderPosition.y, this);
+        g2.drawImage(image, -image.getWidth(this) / 2, -image.getWidth(this) / 2, this); //renderPosition.x, renderPosition.y
     }
     
     protected void recalcTransformation() {
-        try {
-            AffineTransform translateInstance = AffineTransform.getTranslateInstance(+image.getWidth(this) / 2,
-                    +image.getWidth(this) / 2);
+    	try {
+            AffineTransform translateInstance = AffineTransform.getTranslateInstance(renderPosition.x+image.getWidth(this) / 2, renderPosition.y+image.getWidth(this) / 2);//image.getWidth(this) / 2, image.getWidth(this) / 2);
             AffineTransform inverse = translateInstance.createInverse();
             AffineTransform rotateInstance = AffineTransform.getRotateInstance(Math.toRadians(rotation));
+            //AffineTransform at = translateInstance;
+            
             AffineTransform at = translateInstance;
             at.concatenate(rotateInstance);
-            at.concatenate(inverse);
+            //at.concatenate(rotateInstance);
+            //at.concatenate(inverse);
             curTransform = at;
         } catch (NoninvertibleTransformException e) {
             e.printStackTrace();
@@ -65,7 +67,9 @@ public class TransparentRotatedImage extends JPanel {
     }
     
     public void setPosition(int X, int Y){
-    	renderPosition.x = X+this.getWidth()/2;
-    	renderPosition.y = Y+this.getHeight()/2;
+    	renderPosition.x = X;//+image.getWidth(this)/2;//this.getWidth()/2;
+    	renderPosition.y = Y;//+image.getHeight(this)/2;//this.getHeight()/2;
+    	recalcTransformation();
+    	repaint();
     }
 }
