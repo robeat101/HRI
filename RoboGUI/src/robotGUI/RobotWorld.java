@@ -10,8 +10,12 @@ import robotGenericValues.StandardValues;
 public class RobotWorld {
 
 	//robots
-	private int nRobots;
+	private int nRobots = 10;
 	private Robot[] robots;
+	
+	//obstacles
+	private int nObstacles = 30;
+	private Obstacle[] obstacles;
 	
 	//occupancy grid
 	private static int defaultRows = 20;
@@ -41,14 +45,23 @@ public class RobotWorld {
 			}
 		}
 		makeRobots();
+		makeObstacles();
 	}
 	
 	private void makeRobots(){
 		//make a bunch of robots
-		nRobots = 10;
+		//nRobots = 10;
 		robots = new Robot[nRobots];
 		for (int i=0;i<nRobots;i++){
 			robots[i] = makeRandomRobot(i);
+		}
+	}
+	
+	private void makeObstacles(){
+		//nObstacles = 15;
+		obstacles = new Obstacle[nObstacles];
+		for (int i=0;i<nObstacles;i++){
+			obstacles[i] = makeRandomObstacle();
 		}
 	}
 	
@@ -86,10 +99,12 @@ public class RobotWorld {
 		//create the robot
 		Robot robot =  new Robot(randPos,theta, goal, intelligence, id, this);
 		
-		// add the robot as the occupant of its own grid cell
-		grid[randPos.getCol()][randPos.getRow()] = robot;
-		
 		return robot;
+	}
+	
+	private Obstacle makeRandomObstacle(){
+		Cell randPos = getRadomUnoccupiedCell();	//make a random unoccupied position
+		return new Obstacle(randPos, this);
 	}
 	
 	Occupant getOccupant(Cell c){
@@ -134,6 +149,7 @@ public class RobotWorld {
 	public void draw(Graphics g){
 //		System.out.println("Drawing Robot world...");
 		drawGrid((Graphics2D)g);
+		drawObstacles(g);
 		drawRobots(g);
 	}
 	
@@ -157,4 +173,10 @@ public class RobotWorld {
 		}
 	}
 
+	
+	private void drawObstacles(Graphics g){
+		for (int i=0;i<nObstacles;i++){
+			obstacles[i].draw(g, this);
+		}
+	}
 }

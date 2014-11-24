@@ -44,7 +44,7 @@ public class Robot extends Occupant{
 	TransparentRotatedImage img;
 	
 	public Robot(Cell c, int theta, Cell curGoal, float intelligence, int id, RobotWorld world) {
-		super(c);
+		super(c, world);
 		this.theta = theta;
 		this.curGoal = curGoal;
 		this.intelligence = intelligence;

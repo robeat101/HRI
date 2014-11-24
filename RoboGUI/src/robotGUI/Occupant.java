@@ -9,12 +9,13 @@ public abstract class Occupant{
 	
 	Cell pos;
 	
-	public Occupant(Cell p){
+	public Occupant(Cell p, RobotWorld world){
 		pos = p;
+		world.grid[p.getCol()][p.getRow()]=this;
 	}
 	
-	public Occupant(Point p){
-		pos = new Cell(p);
+	public Occupant(Point p, RobotWorld world){
+		this(new Cell(p), world);
 	}
 	
 	public void setCol(int c){
