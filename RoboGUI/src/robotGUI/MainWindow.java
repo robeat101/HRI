@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 
 import java.awt.Color;
 
+import java.awt.Dimension;
 //drawing on panels
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -77,28 +78,9 @@ public class MainWindow{
 		frame.getContentPane().add(chckbxControlSomething, BorderLayout.WEST);
 		
 		overheadViewPanel = new overheadView();
-		overheadViewPanel.setBackground(Color.BLACK);
-		//overheadViewPanel.setOpaque(true);
-		
-
-		
-		//frame.pack();
-		/*
-		TransparentRotatedImage img = null;
-		ImageIcon icon = null;
-		try{
-			icon = new ImageIcon("C:/Users/Dan/Documents/CLASSWORK/Nick MQP/EclipseWorkspace/HRI/RoboGUI/resources/sea-turtle.png");
-			img = new TransparentRotatedImage(icon.getImage());
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		System.out.println("icon: "+icon.toString());
-		System.out.println("image: "+img.toString());
-		System.out.println("panel: " + overheadViewPanel.toString());
-		overheadViewPanel.add(img);
-		*/
-		
+		overheadViewPanel.setBackground(Color.BLACK);		
 		frame.getContentPane().add(overheadViewPanel, BorderLayout.CENTER);
+		frame.setResizable(false);
 		
 		frame.setVisible(true);
 	}

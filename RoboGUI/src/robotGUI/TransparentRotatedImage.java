@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 
@@ -14,10 +15,15 @@ import javax.swing.JPanel;
 public class TransparentRotatedImage extends JPanel {
 	private final Image image;
     private double rotation;
-
-    public TransparentRotatedImage(Image image) {
+    private AffineTransform curTransform;
+    private Point renderPosition;
+    
+    public TransparentRotatedImage(Image image, double rot, Point position) {
         this.image = image;
         setOpaque(false);
+        rotation = rot;
+        renderPosition = position;
+        recalcTransformation();
     }
 
     @Override
@@ -27,11 +33,11 @@ public class TransparentRotatedImage extends JPanel {
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
         g2.setColor(new Color(0, 0, 200, 90));
         g2.fillRect(0, 0, getWidth(), getHeight());
-        g2.setTransform(getTransformation());
-        g2.drawImage(image, 0, 0, this);
+        g2.setTransform(curTransform);
+        g2.drawImage(image, renderPosition.x, renderPosition.y, this);
     }
-
-    protected AffineTransform getTransformation() {
+    
+    protected void recalcTransformation() {
         try {
             AffineTransform translateInstance = AffineTransform.getTranslateInstance(+image.getWidth(this) / 2,
                     +image.getWidth(this) / 2);
@@ -40,10 +46,10 @@ public class TransparentRotatedImage extends JPanel {
             AffineTransform at = translateInstance;
             at.concatenate(rotateInstance);
             at.concatenate(inverse);
-            return at;
+            curTransform = at;
         } catch (NoninvertibleTransformException e) {
             e.printStackTrace();
-            return null;
+            curTransform = null;
         }
     }
 
@@ -54,6 +60,12 @@ public class TransparentRotatedImage extends JPanel {
 
     public void setRotation(double rotation) {
         this.rotation = rotation;
+        recalcTransformation();
         repaint();
+    }
+    
+    public void setPosition(int X, int Y){
+    	renderPosition.x = X+this.getWidth()/2;
+    	renderPosition.y = Y+this.getHeight()/2;
     }
 }
