@@ -84,7 +84,8 @@ public class Robot extends Occupant{
 		img.setRotation(theta);
 	}
 
-	public void moveRobot(status moveStatus, RobotWorld world) throws InvalidHeadingException
+	
+	public void moveRobot(RobotWorld world) throws InvalidHeadingException
 	{
 		//System.out.println("\t\t\tMoving Robot " + moveStatus.toString());
 		
@@ -92,7 +93,7 @@ public class Robot extends Occupant{
 		{
 			throw new InvalidHeadingException("Cannot move robot when theta is " + theta + ".");
 		} else{
-			int directionSign = (moveStatus == status.FORWARD) ? 1 : -1;
+			int directionSign = (robotStatus == status.FORWARD) ? 1 : -1;
 			int newRow = this.pos.getRow();
 			int newCol = this.pos.getCol();
 			
@@ -125,6 +126,7 @@ public class Robot extends Occupant{
 			}
 		}
 	}
+	
 	private void recalcRenderPosition(RobotWorld world){
 		int x=Math.round(this.pos.getCol()*world.getColSpace());
 		int y=Math.round(this.pos.getRow()*world.getRowSpace());
@@ -135,7 +137,7 @@ public class Robot extends Occupant{
 		
 		if(robotStatus == status.FORWARD || robotStatus == status.BACKWARD) {
 			try {
-				moveRobot(robotStatus, world);
+				moveRobot(world);
 			} catch (InvalidHeadingException e) {
 				e.printStackTrace();
 			}
@@ -147,6 +149,22 @@ public class Robot extends Occupant{
 		else if(robotStatus == status.WAITING)
 		{
 			//TODO: Call check next step function
+		}
+	}
+	
+	public void interpolateRobot(RobotWorld world, float amount){
+		if(robotStatus == status.FORWARD || robotStatus == status.BACKWARD) {
+			int directionSign = (robotStatus == status.FORWARD) ? 1 : -1;
+			int dx = directionSign * (int) Math.round(StandardValues.DELTA_POS * Math.cos(Math.toRadians(theta)));
+			int dy = directionSign * (int) Math.round(StandardValues.DELTA_POS * Math.sin(Math.toRadians(theta)));
+			int x=Math.round((this.pos.getCol()+amount*dx)*world.getColSpace());
+			int y=Math.round((this.pos.getRow()+amount*dy)*world.getRowSpace());
+			this.img.setPosition(x, y);
+		}
+		else if (robotStatus == status.LEFT || robotStatus == status.RIGHT)
+		{
+			//int directionSign = (robotStatus == status.RIGHT) ? 1 : -1;
+			//setRotation(theta+directionSign*90*amount);
 		}
 	}
 

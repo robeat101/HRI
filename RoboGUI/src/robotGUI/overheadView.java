@@ -37,6 +37,10 @@ public class overheadView extends JPanel {
     	world.update();        	
     	repaint();
     }
+    public void interpolate(float amount){
+    	world.interpolate(amount);
+    	repaint();
+    }
     
 	public overheadView(){
 		int width = 800;

@@ -45,7 +45,7 @@ public class RobotWorld {
 	
 	private void makeRobots(){
 		//make a bunch of robots
-		nRobots = 2;
+		nRobots = 10;
 		robots = new Robot[nRobots];
 		for (int i=0;i<nRobots;i++){
 			robots[i] = makeRandomRobot(i);
@@ -58,10 +58,20 @@ public class RobotWorld {
 		updateRobots();
 	}
 	
+	public void interpolate(float amount){
+		interpolateRobots(amount);
+	}
+	
 	private void updateRobots(){
 //		System.out.println("\t\tUpdate robots...");
 		for (int i=0;i<nRobots;i++){
 			robots[i].updateRobot(this);
+		}
+	}
+	
+	public void interpolateRobots(float amount){
+		for (int i=0;i<nRobots;i++){
+			robots[i].interpolateRobot(this, amount);
 		}
 	}
 	
