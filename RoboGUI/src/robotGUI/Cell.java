@@ -16,8 +16,8 @@ public class Cell {
 		col=p.x;
 	}
 	
-	public Point toPoint(){
-		return new Point(col, row);
+	public Point toPoint(RobotWorld world){
+		return new Point(Math.round(col*world.getColSpace()), Math.round(row*world.getRowSpace()));
 	}
 	
 	public int getCol(){
@@ -32,5 +32,9 @@ public class Cell {
 	}
 	public void setRow(int r){
 		this.row=r;
+	}
+	
+	public String toString(){
+		return "["+Integer.toString(this.col)+", "+Integer.toString(this.row)+"]";
 	}
 }

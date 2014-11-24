@@ -5,7 +5,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 
 
-public abstract class Occupant extends Component{
+public abstract class Occupant{
 	
 	Cell pos;
 	
@@ -23,10 +23,10 @@ public abstract class Occupant extends Component{
 	public void setRow(int r){
 		this.pos.setRow(r);
 	}
-	
+	/*
 	public void paintComponent(Graphics g) {
 		// TODO Auto-generated method stub
 		System.out.println("Occupant Paint Called!");
 	}
-
+	 */
 }
