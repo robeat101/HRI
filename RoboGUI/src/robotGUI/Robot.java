@@ -28,11 +28,12 @@ public class Robot {
 	//status
 	private status robotStatus;
 
-	public Robot(Point pos, int theta, Point curGoal, float intelligence) {
+	public Robot(Point pos, float intelligence, Point curGoal, Point[] path, status robotStatus) {
 		this.pos = pos;
-		this.theta = theta;
-		this.curGoal = curGoal;
 		this.intelligence = intelligence;
+		this.curGoal = curGoal;
+		this.path = path;
+		this.robotStatus = robotStatus;
 	}
 
 	public void turnRobot(status turnStatus)
