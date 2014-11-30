@@ -5,39 +5,60 @@
 
 package robotGUI;
 
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.Transparency;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.swing.AbstractAction;
 
 public class overheadView extends JPanel {
+
+	Graphics2D g2d;
+	 
+	RobotWorld world;
+    
+    public void update(){
+    	world.update();        	
+    	repaint();
+    }
+    public void interpolate(float amount){
+    	world.interpolate(amount);
+    	repaint();
+    }
+    
+	public overheadView(){
+		int width = 800;
+		int height = 800;
+		this.setPreferredSize(new Dimension(width,height));
+		world = new RobotWorld(width, height);
+	}
+	
 	private void doDrawing(Graphics g) {
-
-		int rows = 20;
-		int cols=20;
-		int rowSpace = this.getHeight()/rows;
-		int colSpace = this.getWidth()/cols;
-		
-        Graphics2D g2d = (Graphics2D) g;
-
-        int x,y;
-        for (int r=0;r<=rows;r++){
-        	y=r*rowSpace;
-        	g2d.drawLine(0, y, this.getWidth(),y);
-        }
-        for (int c=0;c<=cols;c++){
-        	x=c*colSpace;
-        	g2d.drawLine(x, 0, x, this.getHeight());
-        }
-   } 
+        
+        //draw RobotWorld
+        world.draw(g);
+	} 
 	
 	@Override
     public void paintComponent(Graphics g) {
-        
         super.paintComponent(g);
+
         doDrawing(g);
     }    
 }
