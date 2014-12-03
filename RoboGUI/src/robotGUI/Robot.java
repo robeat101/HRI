@@ -3,6 +3,8 @@
  * It records the current position and orientation of the robot (state), as well as some behavior parameters.
  */
 
+//TODO: A* somewhere
+
 package robotGUI;
 
 import java.awt.AlphaComposite;
