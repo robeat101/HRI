@@ -9,4 +9,5 @@ public class StandardValues {
 	public final static int VALID_HEADING_STEP = 90;
 	public final static int ASTAR_STEP_COST = 10;
 	
+	public final static float MAX_USER_FIXING_ABILITY = 100.0f;
 }

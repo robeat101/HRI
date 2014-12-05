@@ -9,6 +9,7 @@ import java.awt.BorderLayout;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.JRadioButton;
 import javax.swing.JCheckBox;
@@ -77,11 +78,16 @@ public class MainWindow{
 	// Initialize the contents of the frame.
 	//
 	private void initialize() {
+		int side = 900;
 		frame = new JFrame();
 		frame.setBackground(Color.GRAY);
-		frame.setBounds(0,0,900, 900);
+		frame.setBounds(0,0,side, side);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
+		
+		JProgressBar rechargeIndicator = new JProgressBar(JProgressBar.VERTICAL, 0, side);
+		rechargeIndicator.setValue(rechargeIndicator.getMaximum());
+		frame.getContentPane().add(rechargeIndicator, BorderLayout.EAST);
 		
 		/*
 		JLabel lblHello = new JLabel("Hello, welcome to robot world");
@@ -104,7 +110,8 @@ public class MainWindow{
 		frame.setResizable(false);
 		frame.pack();
 		frame.setVisible(true);
-		
+		overheadViewPanel.setUserIndicator(rechargeIndicator);
+
 	}
 	
 }

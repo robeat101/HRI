@@ -9,6 +9,9 @@ import robotGenericValues.StandardValues;
 
 public class RobotWorld {
 
+	//users
+	User user;
+	
 	//robots
 	private int nRobots = 10;
 	private Robot[] robots;
@@ -36,6 +39,9 @@ public class RobotWorld {
 		colSpace = (float)WIDTH/(float)rows;
 		rowSpace = (float)HEIGHT/(float)cols;
 		System.out.println("Making RobotWorld of "+cols+"X"+rows+" cells each size "+colSpace+"x"+rowSpace+".");
+		
+		//make user
+		user = new User();
 		
 		//make robots and add them to the grid
 		grid = new Occupant[cols][rows];
@@ -73,6 +79,7 @@ public class RobotWorld {
 	
 	public void interpolate(float amount){
 		interpolateRobots(amount);
+		user.update();
 	}
 	
 	private void updateRobots(){
@@ -86,6 +93,7 @@ public class RobotWorld {
 		for (int i=0;i<nRobots;i++){
 			robots[i].interpolateRobot(this, amount);
 		}
+		user.update();
 	}
 	
 	private Robot makeRandomRobot(int id){
@@ -177,6 +185,23 @@ public class RobotWorld {
 	private void drawObstacles(Graphics g){
 		for (int i=0;i<nObstacles;i++){
 			obstacles[i].draw(g, this);
+		}
+	}
+	
+	public float getUserRechargeLevel(){
+		return user.getFixingPercent();
+	}
+	
+	public void userClick(int x, int y){
+		int cellX = (int)(x/colSpace);
+		int cellY = (int)(y/rowSpace);
+//		System.out.println("User clicked on world cell ("+cellX+","+cellY+")");
+		
+		Occupant currOccupant = getOccupant(new Cell(cellX, cellY));
+		if (currOccupant != null){
+			if (currOccupant instanceof Robot){
+				user.fixRobot((Robot)currOccupant);
+			}
 		}
 	}
 }

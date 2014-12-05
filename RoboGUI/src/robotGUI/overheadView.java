@@ -17,17 +17,21 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.AbstractAction;
 
-public class overheadView extends JPanel {
+public class overheadView extends JPanel implements MouseListener{
 
 	Graphics2D g2d;
 	 
@@ -47,6 +51,11 @@ public class overheadView extends JPanel {
 		int height = 800;
 		this.setPreferredSize(new Dimension(width,height));
 		world = new RobotWorld(width, height);
+		addMouseListener(this);
+	}
+	
+	public void setUserIndicator(JProgressBar indicator){
+		this.world.user.setindicator(indicator);
 	}
 	
 	private void doDrawing(Graphics g) {
@@ -60,5 +69,25 @@ public class overheadView extends JPanel {
         super.paintComponent(g);
 
         doDrawing(g);
-    }    
+    }
+	
+	
+	
+	@Override
+	public void mouseClicked(MouseEvent e) {
+//		System.out.println("Mouse clicked in overhead view at ("+e.getX()+","+e.getY()+")");
+		int x= e.getX();
+		int y= e.getY();
+		world.userClick(x,y);
+	}
+	
+	
+	@Override
+	public void mouseEntered(MouseEvent e){}
+	@Override
+	public void mouseExited(MouseEvent e){}
+	@Override
+	public void mousePressed(MouseEvent e){}
+	@Override
+	public void mouseReleased(MouseEvent e){}    
 }

@@ -140,7 +140,7 @@ public class Robot extends Occupant {
 					recalcRenderPosition(world);
 				} else
 				{
-					System.out.println("Robot collision detected!");
+//					System.out.println("Robot collision detected!");
 				}
 			} else
 			{
@@ -271,6 +271,11 @@ public class Robot extends Occupant {
 	{
 		// System.out.println("\tDrawing Robot at "+this.pos.toString()+", "+theta+"deg)");
 		img.paintComponent(g);
+	}
+	
+	public void fix(){
+		//TODO: the user clicked on this robot to fix it. Fix it
+		System.out.println("Robot "+ this.ID + "Fixed!");
 	}
 
 }
