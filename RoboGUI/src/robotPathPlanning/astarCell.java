@@ -27,6 +27,12 @@ public class astarCell {
 		this.parent = parent;
 	}
 	
+	public boolean equals(astarCell q)
+	{
+		return q.getPos().getCol() == pos.getCol() && q.getPos().getRow() == pos.getRow();
+		
+	}
+	
 	public float getCost(Cell Goal)
 	{
 		if(parent!= null)
@@ -36,6 +42,12 @@ public class astarCell {
 		this.f = this.g + calcHeuristics(Goal);
 		return this.f;
 	}
+
+	public astarCell getParent()
+	{
+		return parent;
+	}
+
 
 	private float calcHeuristics(Cell goal)
 	{

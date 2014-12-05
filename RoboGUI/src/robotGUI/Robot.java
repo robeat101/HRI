@@ -28,6 +28,8 @@ import java.util.*;
 
 import javax.imageio.ImageIO;
 
+import com.ibm.icu.impl.ReplaceableUCharacterIterator;
+
 public class Robot extends Occupant {
 	private int				ID;
 
@@ -39,7 +41,7 @@ public class Robot extends Occupant {
 
 	// goals
 	private Cell			curGoal;
-	private Cell[]			path;
+	private Stack<astarCell>			path;
 
 	// status
 	private status			robotStatus;
@@ -205,47 +207,100 @@ public class Robot extends Occupant {
 		List<astarCell> openCells = new ArrayList<astarCell>();
 		List<astarCell> closedCells = new ArrayList<astarCell>();
 		openCells.add(new astarCell(pos));
-		
-		
+
 		while (!openCells.isEmpty())
 		{
 			astarCell q = findLeastCostNode(openCells);
+			if(q.equals(new astarCell(curGoal)))
+			{
+				setPath(q); 
+			}
 			openCells.remove(q);
 			List<astarCell> potentialSuccessors = getSuccessors(q);
-			openCells = checkSuccessors(potentialSuccessors, openCells, closedCells);
+			openCells = checkSuccessors(potentialSuccessors, openCells,
+					closedCells, world);
 
 		}
 
 	}
 
-	private List<astarCell> checkSuccessors(List<astarCell> potentialSuccessors, List<astarCell> openCells, List<astarCell> closedCells) {
+	private void setPath(astarCell q)
+	{
+		Stack<astarCell> path = new Stack<astarCell>(); 
+		while(q.getParent() != null)
+		{
+			path.push(q);
+			q = q.getParent();
+		}
+		this.path = path;
+	}
 
+	private List<astarCell> checkSuccessors(
+			List<astarCell> potentialSuccessors, List<astarCell> openCells,
+			List<astarCell> closedCells, RobotWorld world)
+	{
+		astarCell q = null;
+		int size = potentialSuccessors.size();
+		boolean validCell = false;
+		int replaceIndex = -1;
+		for (int i = 0; i < size; i++)
+		{
+			q = potentialSuccessors.get(i);
+			if (!world.occupied(q.getPos()))
+			{
+				validCell = true;
+				for(int j = 0; j < openCells.size(); j++)
+					if(openCells.get(j).equals(q))
+					{
+						replaceIndex = j;
+						if(openCells.get(j).getCost(curGoal) < q.getCost(curGoal))
+						{
+							validCell = false;
+						}
+					}
+				for(int j = 0; j < closedCells.size(); j++)
+					if(closedCells.get(j).equals(q))
+					{
+						if(openCells.get(j).getCost(curGoal) < q.getCost(curGoal))
+						{
+							validCell = false;
+						}
+					}
+				if(validCell)
+				{
+					if(replaceIndex > -1)
+						openCells.remove(replaceIndex);
+					openCells.add(q);
+				}
+			}
+		}
 		return openCells;
 	}
 
-	private List<astarCell> getSuccessors(astarCell q) {
+	private List<astarCell> getSuccessors(astarCell q)
+	{
 		List<astarCell> potentialSuccessors = new ArrayList<astarCell>();
 		Cell newPosition;
-		//Top
-		if(inWorldRange(q.getPos().getRow(), q.getPos().getCol() + 1))
+		// Top
+		if (inWorldRange(q.getPos().getRow(), q.getPos().getCol() + 1))
 		{
 			newPosition = new Cell(q.getPos().getRow(), q.getPos().getCol() + 1);
 			potentialSuccessors.add(new astarCell(newPosition, q));
 		}
-		//Right
-		if(inWorldRange(q.getPos().getRow() + 1, q.getPos().getCol()))
+		// Right
+		if (inWorldRange(q.getPos().getRow() + 1, q.getPos().getCol()))
 		{
 			newPosition = new Cell(q.getPos().getRow() + 1, q.getPos().getCol());
 			potentialSuccessors.add(new astarCell(newPosition, q));
 		}
-		//Bottom
-		if(inWorldRange(q.getPos().getRow(), q.getPos().getCol() - 1))
+		// Bottom
+		if (inWorldRange(q.getPos().getRow(), q.getPos().getCol() - 1))
 		{
 			newPosition = new Cell(q.getPos().getRow(), q.getPos().getCol() - 1);
 			potentialSuccessors.add(new astarCell(newPosition, q));
 		}
-		//Left
-		if(inWorldRange(q.getPos().getRow() - 1, q.getPos().getCol()))
+		// Left
+		if (inWorldRange(q.getPos().getRow() - 1, q.getPos().getCol()))
 		{
 			newPosition = new Cell(q.getPos().getRow() - 1, q.getPos().getCol());
 			potentialSuccessors.add(new astarCell(newPosition, q));
@@ -255,7 +310,8 @@ public class Robot extends Occupant {
 
 	private boolean inWorldRange(int x, int y)
 	{
-		return x < RobotWorld.defaultRows && x > 0 && y < RobotWorld.defaultCols && y > 0;
+		return x < RobotWorld.defaultRows && x > 0
+				&& y < RobotWorld.defaultCols && y > 0;
 	}
 
 	private astarCell findLeastCostNode(List<astarCell> listOfAstarCells)
@@ -263,7 +319,9 @@ public class Robot extends Occupant {
 		int size = listOfAstarCells.size();
 		astarCell calc = listOfAstarCells.get(0);
 		for (int i = 0; i < size; i++)
-			if (calc.getCost(this.curGoal) > listOfAstarCells.get(i).getCost(curGoal)) calc = listOfAstarCells.get(i);
+			if (calc.getCost(this.curGoal) > listOfAstarCells.get(i).getCost(
+					curGoal))
+				calc = listOfAstarCells.get(i);
 		return calc;
 	}
 
