@@ -18,8 +18,8 @@ public class RobotWorld {
 	private Obstacle[] obstacles;
 	
 	//occupancy grid
-	private static int defaultRows = 20;
-	private static int defaultCols = 20;
+	public static int defaultRows = 20;
+	public static int defaultCols = 20;
 	private int rows;
 	private int cols;
 	private float rowSpace;
