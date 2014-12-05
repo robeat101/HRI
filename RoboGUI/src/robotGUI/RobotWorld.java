@@ -111,7 +111,7 @@ public class RobotWorld {
 		return grid[c.getCol()][c.getRow()];
 	}
 	
-	boolean occupied(Cell c){
+	public boolean occupied(Cell c){
 		return (getOccupant(c) != null);
 	}
 	
