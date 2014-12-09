@@ -105,7 +105,7 @@ public class MainWindow{
 		frame.getContentPane().add(chckbxControlSomething, BorderLayout.WEST);
 		*/
 		overheadViewPanel = new overheadView();
-		overheadViewPanel.setBackground(Color.BLACK);		
+		overheadViewPanel.setBackground(Color.WHITE);		
 		frame.getContentPane().add(overheadViewPanel, BorderLayout.CENTER);
 		frame.setResizable(false);
 		frame.pack();

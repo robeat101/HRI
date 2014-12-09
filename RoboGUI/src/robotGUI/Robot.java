@@ -45,6 +45,14 @@ public class Robot extends Occupant {
 	private int renderGoalX;
 	private int renderGoalY;
 
+	//robot colors
+	private final static String[] possibleRobotColors = {"RED", "BLUE", "GREEN", "YELLOW", "ORANGE", "VIOLET"};
+	private final static Color[] correspondingGoalColors = {Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, new Color(255,99,0), Color.MAGENTA};
+	public final static int nPossibleRobotColors = possibleRobotColors.length;
+	
+	//goal
+	private static final int GOAL_WIDTH = 20;
+	
 	public Robot(Cell c, int theta, Cell curGoal, float intelligence, int id,
 			RobotWorld world)
 	{
@@ -61,7 +69,7 @@ public class Robot extends Occupant {
 		try
 		{
 			img = new TransparentRotatedImage(ImageIO.read(new File(
-					"images/turtle.png")), new Dimension(Math.round(world
+					"images/robot_"+possibleRobotColors[id]+".png")), new Dimension(Math.round(world
 					.getColSpace()), Math.round(world.getRowSpace())), theta,
 					c.toPoint(world));
 		} catch (IOException e1)
@@ -161,8 +169,8 @@ public class Robot extends Occupant {
 		this.renderY = Math.round(this.pos.getRow() * world.getRowSpace());
 		this.img.setPosition(this.renderX, this.renderY);
 
-		this.renderGoalX = Math.round(this.curGoal.getCol() * world.getColSpace());
-		this.renderGoalY = Math.round(this.curGoal.getRow() * world.getRowSpace());
+		this.renderGoalX = Math.round((this.curGoal.getCol()+0.5f) * world.getColSpace()-GOAL_WIDTH/2.0f);
+		this.renderGoalY = Math.round((this.curGoal.getRow()+0.5f) * world.getRowSpace()-GOAL_WIDTH/2.0f);
 	}
 
 	public void updateRobot(RobotWorld world)
@@ -348,7 +356,8 @@ public class Robot extends Occupant {
 		Graphics2D g2d = (Graphics2D)g;
 
 		// Assume x, y, and diameter are instance variables.
-		Ellipse2D.Double circle = new Ellipse2D.Double(this.renderGoalX, this.renderGoalY, 10, 10);
+		Ellipse2D.Double circle = new Ellipse2D.Double(this.renderGoalX, this.renderGoalY, GOAL_WIDTH, GOAL_WIDTH);
+		g2d.setColor(correspondingGoalColors[this.ID]);
 		g2d.fill(circle);
 		g2d.draw(circle);
 		// System.out.println("\tDrawing Robot at "+this.pos.toString()+", "+theta+"deg)");
