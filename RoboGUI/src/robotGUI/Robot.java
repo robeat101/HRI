@@ -3,30 +3,22 @@
  * It records the current position and orientation of the robot (state), as well as some behavior parameters.
  */
 
-//TODO: A* somewhere
-
 package robotGUI;
 
-import java.awt.AlphaComposite;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-
 import robotExceptions.InvalidHeadingException;
+import robotExceptions.noPathFoundException;
 import robotGenericValues.StandardValues;
 import robotGenericValues.status;
 import robotPathPlanning.astarCell;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.geom.Ellipse2D;
 import java.io.File;
 import java.io.IOException;
-import java.lang.Math;
-import java.util.*;
-
-import javax.imageio.ImageIO;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
 
 import com.ibm.icu.impl.ReplaceableUCharacterIterator;
 
@@ -43,10 +35,15 @@ public class Robot extends Occupant {
 	private Cell			curGoal;
 	private Stack<astarCell>			path;
 
+
 	// status
 	private status			robotStatus;
 
 	TransparentRotatedImage	img;
+	private int renderY;
+	private int renderX;
+	private int renderGoalX;
+	private int renderGoalY;
 
 	public Robot(Cell c, int theta, Cell curGoal, float intelligence, int id,
 			RobotWorld world)
@@ -71,6 +68,13 @@ public class Robot extends Occupant {
 		{
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+		}
+		try{
+			this.Astar(world);
+		}
+		catch(noPathFoundException e)
+		{
+			e.printStackTrace();
 		}
 	}
 
@@ -153,9 +157,12 @@ public class Robot extends Occupant {
 
 	private void recalcRenderPosition(RobotWorld world)
 	{
-		int x = Math.round(this.pos.getCol() * world.getColSpace());
-		int y = Math.round(this.pos.getRow() * world.getRowSpace());
-		this.img.setPosition(x, y);
+		this.renderX = Math.round(this.pos.getCol() * world.getColSpace());
+		this.renderY = Math.round(this.pos.getRow() * world.getRowSpace());
+		this.img.setPosition(this.renderX, this.renderY);
+
+		this.renderGoalX = Math.round(this.curGoal.getCol() * world.getColSpace());
+		this.renderGoalY = Math.round(this.curGoal.getRow() * world.getRowSpace());
 	}
 
 	public void updateRobot(RobotWorld world)
@@ -202,8 +209,9 @@ public class Robot extends Occupant {
 		}
 	}
 
-	public void Astar(RobotWorld world)
+	public void Astar(RobotWorld world) throws noPathFoundException
 	{
+		this.path = null; 
 		List<astarCell> openCells = new ArrayList<astarCell>();
 		List<astarCell> closedCells = new ArrayList<astarCell>();
 		openCells.add(new astarCell(pos));
@@ -214,12 +222,18 @@ public class Robot extends Occupant {
 			if(q.equals(new astarCell(curGoal)))
 			{
 				setPath(q); 
+				break;
 			}
 			openCells.remove(q);
 			List<astarCell> potentialSuccessors = getSuccessors(q);
 			openCells = checkSuccessors(potentialSuccessors, openCells,
 					closedCells, world);
 
+		}
+		
+		if(this.path == null)
+		{
+			throw new noPathFoundException(); 
 		}
 
 	}
@@ -249,6 +263,8 @@ public class Robot extends Occupant {
 			if (!world.occupied(q.getPos()))
 			{
 				validCell = true;
+				replaceIndex = -1;
+
 				for(int j = 0; j < openCells.size(); j++)
 					if(openCells.get(j).equals(q))
 					{
@@ -282,27 +298,27 @@ public class Robot extends Occupant {
 		List<astarCell> potentialSuccessors = new ArrayList<astarCell>();
 		Cell newPosition;
 		// Top
-		if (inWorldRange(q.getPos().getRow(), q.getPos().getCol() + 1))
+		if (inWorldRange(q.getPos().getCol(), q.getPos().getRow() + 1))
 		{
-			newPosition = new Cell(q.getPos().getRow(), q.getPos().getCol() + 1);
+			newPosition = new Cell(q.getPos().getCol(), q.getPos().getRow() + 1);
 			potentialSuccessors.add(new astarCell(newPosition, q));
 		}
 		// Right
-		if (inWorldRange(q.getPos().getRow() + 1, q.getPos().getCol()))
+		if (inWorldRange(q.getPos().getCol() + 1, q.getPos().getRow()))
 		{
-			newPosition = new Cell(q.getPos().getRow() + 1, q.getPos().getCol());
+			newPosition = new Cell(q.getPos().getCol() + 1, q.getPos().getRow());
 			potentialSuccessors.add(new astarCell(newPosition, q));
 		}
 		// Bottom
-		if (inWorldRange(q.getPos().getRow(), q.getPos().getCol() - 1))
+		if (inWorldRange(q.getPos().getCol(), q.getPos().getRow() - 1))
 		{
-			newPosition = new Cell(q.getPos().getRow(), q.getPos().getCol() - 1);
+			newPosition = new Cell(q.getPos().getCol(), q.getPos().getRow() - 1);
 			potentialSuccessors.add(new astarCell(newPosition, q));
 		}
 		// Left
-		if (inWorldRange(q.getPos().getRow() - 1, q.getPos().getCol()))
+		if (inWorldRange(q.getPos().getCol() - 1, q.getPos().getRow()))
 		{
-			newPosition = new Cell(q.getPos().getRow() - 1, q.getPos().getCol());
+			newPosition = new Cell(q.getPos().getCol() - 1, q.getPos().getRow());
 			potentialSuccessors.add(new astarCell(newPosition, q));
 		}
 		return potentialSuccessors;
@@ -310,8 +326,8 @@ public class Robot extends Occupant {
 
 	private boolean inWorldRange(int x, int y)
 	{
-		return x < RobotWorld.defaultRows && x > 0
-				&& y < RobotWorld.defaultCols && y > 0;
+		return x < RobotWorld.defaultCols && x > 0
+				&& y < RobotWorld.defaultRows && y > 0;
 	}
 
 	private astarCell findLeastCostNode(List<astarCell> listOfAstarCells)
@@ -327,8 +343,17 @@ public class Robot extends Occupant {
 
 	public void draw(Graphics g)
 	{
+
+		//Draw goal
+		Graphics2D g2d = (Graphics2D)g;
+
+		// Assume x, y, and diameter are instance variables.
+		Ellipse2D.Double circle = new Ellipse2D.Double(this.renderGoalX, this.renderGoalY, 10, 10);
+		g2d.fill(circle);
+		g2d.draw(circle);
 		// System.out.println("\tDrawing Robot at "+this.pos.toString()+", "+theta+"deg)");
 		img.paintComponent(g);
+
 	}
 	
 	public void fix(){
