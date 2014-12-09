@@ -10,4 +10,5 @@ public class StandardValues {
 	public final static int ASTAR_STEP_COST = 10;
 	
 	public final static float MAX_USER_FIXING_ABILITY = 100.0f;
+	public final static float COST_TO_FIX_ROBOT = 10.0f;
 }

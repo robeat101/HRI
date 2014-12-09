@@ -358,7 +358,7 @@ public class Robot extends Occupant {
 	
 	public void fix(){
 		//TODO: the user clicked on this robot to fix it. Fix it
-		System.out.println("Robot "+ this.ID + "Fixed!");
+		System.out.println("Robot "+ this.ID + " fixed!");
 	}
 
 }

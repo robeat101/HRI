@@ -33,8 +33,10 @@ public class TransparentRotatedImage extends JPanel {
         //g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
         //g2.setColor(new Color(0, 0, 200, 90));
         //g2.fillRect(0, 0, getWidth(), getHeight());
+        AffineTransform prevTransform = g2.getTransform();
         g2.setTransform(curTransform);
         g2.drawImage(image, -image.getWidth(this) / 2, -image.getWidth(this) / 2, this); //renderPosition.x, renderPosition.y
+        g2.setTransform(prevTransform);
     }
     
     protected void recalcTransformation() {

@@ -188,9 +188,6 @@ public class RobotWorld {
 		}
 	}
 	
-	public float getUserRechargeLevel(){
-		return user.getFixingPercent();
-	}
 	
 	public void userClick(int x, int y){
 		int cellX = (int)(x/colSpace);
