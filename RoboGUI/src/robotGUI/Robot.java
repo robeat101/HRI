@@ -41,7 +41,7 @@ public class Robot extends Occupant {
 
 	// goals
 	private Cell			curGoal;
-	private Stack<astarCell>			path;
+	private Stack<Cell>			path;
 
 	// status
 	private status			robotStatus;
@@ -226,10 +226,10 @@ public class Robot extends Occupant {
 
 	private void setPath(astarCell q)
 	{
-		Stack<astarCell> path = new Stack<astarCell>(); 
+		Stack<Cell> path = new Stack<Cell>(); 
 		while(q.getParent() != null)
 		{
-			path.push(q);
+			path.push(q.getPos());
 			q = q.getParent();
 		}
 		this.path = path;
