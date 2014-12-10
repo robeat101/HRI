@@ -98,13 +98,30 @@ public class RobotWorld {
 		user.update();
 	}
 	
+	//ensure a robot doesn't try to get the same goal as another robot
+	private boolean isAUsedGoal(Cell g, int curMaxRobots){
+		for (int r=0;r<curMaxRobots;r++){
+			if (robots[r].getGoal().getCol() == g.getCol() && robots[r].getGoal().getRow() == g.getRow()){
+				return true;
+			}
+		}
+		return false;
+	}
+	private Cell getRandomUnusedGoal(int curMaxRobots){
+		Cell trialGoal = getRadomUnoccupiedCell();
+		while (isAUsedGoal(trialGoal, curMaxRobots)){
+			trialGoal = getRadomUnoccupiedCell();
+		}
+		return trialGoal;
+	}
+	
 	private Robot makeRandomRobot(int id){
 		Random rn = new Random();
 		
 		Cell randPos = getRadomUnoccupiedCell();	//make a random unoccupied position
 		float intelligence = rn.nextFloat();		//make a random intelligence
 		int theta = rn.nextInt(3)*StandardValues.VALID_HEADING_STEP;				//make a random rotation theta
-		Cell goal = getRadomUnoccupiedCell();		//make a random goal
+		Cell goal = getRandomUnusedGoal(id);		//make a random goal
 		
 		//create the robot
 		Robot robot =  new Robot(randPos,theta, goal, intelligence, id, this);
@@ -182,15 +199,13 @@ public class RobotWorld {
 			robots[i].draw(g);
 		}
 	}
-
 	
 	private void drawObstacles(Graphics g){
 		for (int i=0;i<nObstacles;i++){
 			obstacles[i].draw(g, this);
 		}
 	}
-	
-	
+		
 	public void userClick(int x, int y){
 		int cellX = (int)(x/colSpace);
 		int cellY = (int)(y/rowSpace);
