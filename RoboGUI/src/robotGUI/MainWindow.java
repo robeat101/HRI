@@ -64,6 +64,13 @@ public class MainWindow{
 				}
 			}
 		});
+		
+		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+			public void run() {
+				System.out.println("Shutting down");
+				DataLogger.getDataLogger().saveLog();
+			}
+		}));
 	}
 
 	//

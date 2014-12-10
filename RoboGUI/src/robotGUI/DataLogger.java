@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 public class DataLogger {
-	private static final String dataLogBaseName = "HRI_sim_log";
+	private static final String dataLogBaseName = "HRI_sim_log_";
 	private static final String dataLogNumbers = "HRI_sim_log_numbers.txt";
 	private static DataLogger theDataLogger; //singleton
 
@@ -19,12 +19,17 @@ public class DataLogger {
 	public DataLogger(){
 		curLogFileNumber = 100;
 //		System.out.println("Working Directory = " +  System.getProperty("user.dir"));
-		String logNumberFile = "\\\\data\\"+dataLogNumbers;
+		String logNumberFile = "data"+System.getProperty("file.separator")+dataLogNumbers;
 		try{
 			BufferedReader logFileNumberReader = new BufferedReader(new FileReader(logNumberFile));
 			String strLogNumber = logFileNumberReader.readLine();
 			curLogFileNumber = Integer.parseInt(strLogNumber);
 			logFileNumberReader.close();
+			
+			BufferedWriter logFileNumberWriter = new BufferedWriter(new FileWriter(logNumberFile));
+			logFileNumberWriter.write(Integer.toString(curLogFileNumber+1));
+			logFileNumberWriter.flush();
+			logFileNumberWriter.close();
 		}catch(IOException e){
 			System.out.println("ERROR: could not determine current log number file '" +logNumberFile + "'");
 		}
@@ -32,7 +37,7 @@ public class DataLogger {
 
 		
 		curLogFileNumber++;
-		String fileName = "\\\\data"+File.pathSeparator+dataLogBaseName+Integer.toString(curLogFileNumber)+".txt";
+		String fileName = "data"+System.getProperty("file.separator")+dataLogBaseName+Integer.toString(curLogFileNumber)+".txt";
 		try{
 			//create the file if it doesn't exist
 			File f = new File(fileName);
@@ -40,8 +45,10 @@ public class DataLogger {
 			f.createNewFile();
 			//make a writer to the file
 			logFileWriter = new BufferedWriter(new FileWriter(fileName));
-			logFileWriter.flush();
-			logFileWriter.close();
+			logFileWriter.write("Log for trial " + Integer.toString(curLogFileNumber)+".");
+			logFileWriter.newLine();
+//			logFileWriter.flush();
+//			logFileWriter.close();
 		}catch(IOException e){
 			System.out.println("ERROR: could not create log file '"+fileName+"'.");
 		}
@@ -60,6 +67,7 @@ public class DataLogger {
 	}
 	
 	public void saveLog(){
+		System.out.println("Closing log file.");
 		try{
 			logFileWriter.flush();
 			logFileWriter.close();
@@ -70,7 +78,11 @@ public class DataLogger {
 	
 	public void log(String info, long time){
 		try{
-			logFileWriter.write(info+"\tt"+Long.toString(SimTimer.getCurTime()));
+			String log = info+"\tt"+Long.toString(SimTimer.getCurTime());
+			System.out.println("Writing '"+log+"' to log file");
+					
+			logFileWriter.write(log);
+			logFileWriter.newLine();
 		}catch(IOException e){
 			System.out.println("ERROR: could write to log file.");
 		}
