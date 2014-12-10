@@ -320,12 +320,12 @@ public class Robot extends Occupant {
 			}
 			
 			//not the goal
-			
+			openCells.remove(q);//Pop q from open set. 
+
 			List<astarCell> potentialSuccessors = getSuccessors(q);	//get its neighbors
-			openCells = checkSuccessors(potentialSuccessors, openCells,	//add unexplored neighbors to the open set
-					closedCells, world);
-			openCells.remove(q);	//remove the cell from the open set
-//			System.out.println("Open set is " + ListOfAStarCellsToString(openCells));
+			openCells = checkSuccessors(potentialSuccessors, openCells,	closedCells, world); //add unexplored neighbors to the open set
+
+			closedCells.add(q); //Add q to closed set.
 		}
 		
 		if(this.path == null)
@@ -374,7 +374,7 @@ public class Robot extends Occupant {
 				for(int j = 0; j < closedCells.size(); j++)
 					if(closedCells.get(j).equals(q))
 					{
-						if(openCells.get(j).getCost(curGoal) < q.getCost(curGoal))
+						if(closedCells.get(j).getCost(curGoal) < q.getCost(curGoal))
 						{
 							validCell = false;
 						}
