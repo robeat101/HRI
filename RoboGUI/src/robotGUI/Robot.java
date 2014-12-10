@@ -222,6 +222,7 @@ public class Robot extends Occupant {
 				break;
 			}
 			openCells.remove(q);
+			closedCells.add(q);
 			List<astarCell> potentialSuccessors = getSuccessors(q);
 			openCells = checkSuccessors(potentialSuccessors, openCells,
 					closedCells, world);
@@ -273,7 +274,7 @@ public class Robot extends Occupant {
 				for(int j = 0; j < closedCells.size(); j++)
 					if(closedCells.get(j).equals(q))
 					{
-						if(openCells.get(j).getCost(curGoal) < q.getCost(curGoal))
+						if(closedCells.get(j).getCost(curGoal) < q.getCost(curGoal))
 						{
 							validCell = false;
 						}
