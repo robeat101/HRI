@@ -34,21 +34,21 @@ public class MainWindow{
 	private JTextField txtSomeTextHere;
 	private JCheckBox chckbxControlSomething;
 	private overheadView overheadViewPanel;
-	private long time = 0;
-    private Timer timer = new Timer(StandardValues.DELTA_TIME_INTERPOLATE, new AbstractAction() {
-        @Override
-        public void actionPerformed(ActionEvent ae) {
-        	time++;
-        	int interpolationsPerTimeStep = StandardValues.DELTA_TIME/StandardValues.DELTA_TIME_INTERPOLATE;
-        	int remainder = (int)(time%(long)interpolationsPerTimeStep);
-        	if (remainder!=0){
-        		overheadViewPanel.interpolate((float)remainder/interpolationsPerTimeStep);
-        	}else{
-//        	System.out.println("UPDATE SIMULATION:");
-        		overheadViewPanel.update();
-        	}
-        }
-    });
+    
+//	private Timer timer = new Timer(StandardValues.DELTA_TIME_INTERPOLATE, new AbstractAction() {
+//        @Override
+//        public void actionPerformed(ActionEvent ae) {
+//        	time++;
+//        	int interpolationsPerTimeStep = StandardValues.DELTA_TIME/StandardValues.DELTA_TIME_INTERPOLATE;
+//        	int remainder = (int)(time%(long)interpolationsPerTimeStep);
+//        	if (remainder!=0){
+//        		overheadViewPanel.interpolate((float)remainder/interpolationsPerTimeStep);
+//        	}else{
+////        	System.out.println("UPDATE SIMULATION:");
+//        		overheadViewPanel.update();
+//        	}
+//        }
+//    });
 	
 	//
 	//Launch the application.
@@ -71,7 +71,7 @@ public class MainWindow{
 	//
 	public MainWindow() {
 		initialize();
-		timer.start();
+		SimTimer.makeTheTimer(overheadViewPanel);
 	}
 
 	//

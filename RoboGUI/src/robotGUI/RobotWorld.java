@@ -52,6 +52,8 @@ public class RobotWorld {
 		}
 		makeRobots();
 		makeObstacles();
+		
+		DataLogger.initDataLogger();
 	}
 	
 	private void makeRobots(){
