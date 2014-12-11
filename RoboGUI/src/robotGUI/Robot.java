@@ -56,27 +56,14 @@ public class Robot extends Occupant {
 	//goal
 	private static final int GOAL_WIDTH = 20;
 	
-	public void setNewGoal(Cell curGoal, RobotWorld world){
-		System.out.println("Setting robot " + this.ID + " goal to " + curGoal.toString());
-		this.curGoal = curGoal;
-		this.recalcGoalRenderPosition(world);
-		try{
-			this.Astar(world);
-		}
-		catch(noPathFoundException e)
-		{
-			e.printStackTrace();
-		}
-		setStatusToGetToNextPathCell(); 
-	}
-	
-	public Robot(Cell c, int theta, float intelligence, int id,
+	public Robot(Cell c, int theta, Cell curGoal, float intelligence, int id,
 			RobotWorld world)
 	{
 		super(c, world);
 		this.theta = theta;
+		this.curGoal = curGoal;
 		this.intelligence = intelligence;
-		this.robotStatus = status.WAITING;
+		this.robotStatus = status.FORWARD;
 		this.ID = id;
 		System.out.println("Making new robot "+ID+" with position (" + c.getCol()
 				+ "," + c.getRow() + ") theta = " + theta + " intelligence="
@@ -93,20 +80,21 @@ public class Robot extends Occupant {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		try{
+			this.Astar(world);
+		}
+		catch(noPathFoundException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
-	//Turns the robot 90 degrees relative to its current rotation depending on the turn status
 	public void turnRobot(status turnStatus)
 	{
 		setRotation(theta + ((turnStatus == status.LEFT)?1:-1)*StandardValues.VALID_HEADING_STEP);
-		if (turnStatus != status.LEFT && turnStatus!=status.RIGHT){
-			System.out.println("ERROR: turnRobot() called when robot wasn't turning!");
-		}
-		robotStatus = status.WAITING;
-		setStatusToGetToNextPathCell();
 	}
 
-	private float normalizeAngle(float angle){
+	private float angleNormalize(float angle){
 		while (angle >= 360)
 		{
 			angle -= 360.0f;
@@ -117,58 +105,53 @@ public class Robot extends Occupant {
 		}
 		return angle;
 	}
-	
-	//sets the absolute robot rotation angle and also rotates the image accordingly.
 	private void setRotation(float angle)
 	{
-		this.theta = normalizeAngle(angle);
-		if (Math.abs(theta % StandardValues.VALID_HEADING_STEP) > 0.1f){
-			System.out.println("ERROR: set rotation angle to non 90-deg increment!");
-		}
+		this.theta = angleNormalize(angle);
+//		if (Math.abs(theta % StandardValues.VALID_HEADING_STEP) > 0.1f){
+//			System.out.println("ERROR: set angle to non 90-deg increment!");
+//		}
 		img.setRotation(theta);
 	}
 
-	private void snapTheta(){
-		//snap theta to nearest cardinal direction
-		this.setRotation(StandardValues.VALID_HEADING_STEP * ((int)(theta+StandardValues.VALID_HEADING_STEP/2)/StandardValues.VALID_HEADING_STEP));
-	}
-	
 	public void moveRobot(RobotWorld world) throws InvalidHeadingException
 	{
-		System.out.println("\tMoving Robot " + robotStatus.toString());
+		// System.out.println("\t\t\tMoving Robot " + moveStatus.toString());
 
-		if (Math.abs(theta % StandardValues.VALID_HEADING_STEP) > 5.0f)	//if the robot is not facing a cardinal direction within some small threshold
+		if (Math.abs(theta % StandardValues.VALID_HEADING_STEP) > 5.0f)
 		{
-			throw new InvalidHeadingException("Cannot move robot when theta is " + theta + ".");
+			throw new InvalidHeadingException(
+					"Cannot move robot when theta is " + theta + ".");
 		} else
 		{
-			//snapTheta();
-			
-			//calculate what row and column we'll end up on when we move
-			int directionSign = (robotStatus == status.FORWARD) ? 1 : -1;
-			if (robotStatus != status.FORWARD && robotStatus != status.BACKWARD){
-				System.out.println("ERROR: Robot moves but was not moving foreward or backward!");
+			//snap theta
+			this.setRotation(90+ StandardValues.VALID_HEADING_STEP * ((int)(theta+StandardValues.VALID_HEADING_STEP/2)/StandardValues.VALID_HEADING_STEP));
+			if (Math.abs(theta % StandardValues.VALID_HEADING_STEP) > 0.1f){
+				System.out.println("ERROR: set angle to non 90-deg increment!");
 			}
-			int newRow = this.pos.getRow(); 
+			
+			int directionSign = (robotStatus == status.FORWARD) ? 1 : -1;
+			int newRow = this.pos.getRow();
 			int newCol = this.pos.getCol();
+
 			newRow += directionSign
-					* (int) 0.5 + Math.round(StandardValues.DELTA_POS
+					* (int) Math.round(StandardValues.DELTA_POS
 							* Math.sin(Math.toRadians(theta)));
 			newCol += directionSign
-					* (int) 0.5 + Math.round(StandardValues.DELTA_POS
+					* (int) Math.round(StandardValues.DELTA_POS
 							* Math.cos(Math.toRadians(theta)));
 
-			// if the position is valid (on the grid)
+			// if the position is valid and there's no one in the new position,
+			// move the robot to its new position in the grid
 			if (newCol < world.getCols() && newRow < world.getRows()
 					&& newCol >= 0 && newRow >= 0)
 			{
 
 				// if the cell we're moving too is unoccupied
-				Occupant curOccupant = world.grid[newCol][newRow];
-				if (curOccupant == null)
+				if (world.grid[newCol][newRow] == null)
 				{
-					world.grid[this.pos.getCol()][this.pos.getRow()] = null; 	//leave our previous position
-					world.grid[newCol][newRow] = this;							//set us as the new occupant of our new position
+					world.grid[this.pos.getCol()][this.pos.getRow()] = null;
+					world.grid[newCol][newRow] = this;
 
 					// actually move ourselves
 					this.pos.setCol(newCol);
@@ -176,100 +159,60 @@ public class Robot extends Occupant {
 
 					// recalculate the place we will be drawn
 					recalcRenderPosition(world);
-					if (!this.path.isEmpty()){
-						Cell nextPathCell = this.path.peek().getPos();
-						if (pos.getCol() == nextPathCell.getCol() && pos.getRow() == nextPathCell.getRow()){
-							this.path.pop(); //NOT we can pop this path cell from the path since we just got to it
-						}else{
-							System.out.println(" ERROR: Robot moved to a cell "+this.pos.toString()+" that was not it's next path cell"+nextPathCell.toString()+".");
-						}
-					}else{
-						System.out.println("ERROR: Robot moved but the path was empty.");
-						reachedGoal(world);
-					}
-					setStatusToGetToNextPathCell();
-
-				} else { // another occupant is currently in the cell
-					System.out.println("Robot collision detected!");
-					if (curOccupant instanceof Obstacle){
-						obstacleEncountered(world);
-					}else{ //hit another robot
-						this.robotStatus = status.WAITING;
-					}
+				} else
+				{
+//					System.out.println("Robot collision detected!");
 				}
-			} else { // robot reached a wall
-				//next cell is occupied - turn around.
-				obstacleEncountered(world);
+			} else
+			{
+				this.setRotation(this.theta + 180); // turn around
 			}
 		}
 	}
-	
-	private void reachedGoal(RobotWorld world){
-		System.out.println("Robot " + this.ID + " at "+this.pos.toString()+" reached its goal "+this.curGoal.toString()+"!");
-		robotStatus = status.WAITING;
-		//TODO: check that the robot actually did reach its goal.
-		//TODO: give points!
-		//TODO: get a new goal from the world!
-	}
 
-	private void obstacleEncountered(RobotWorld world){
-		System.out.println("Robot " + this.ID + " encountered an obstacle!");
-		try{
-			this.Astar(world);
-		}catch(noPathFoundException e){
-			this.robotStatus = status.WAITING;
-		}
-	}
-	
 	private void recalcRenderPosition(RobotWorld world)
 	{
 		this.renderX = Math.round(this.pos.getCol() * world.getColSpace());
 		this.renderY = Math.round(this.pos.getRow() * world.getRowSpace());
 		this.img.setPosition(this.renderX, this.renderY);
-	}
-	
-	private void recalcGoalRenderPosition(RobotWorld world){
+
 		this.renderGoalX = Math.round((this.curGoal.getCol()+0.5f) * world.getColSpace()-GOAL_WIDTH/2.0f);
 		this.renderGoalY = Math.round((this.curGoal.getRow()+0.5f) * world.getRowSpace()-GOAL_WIDTH/2.0f);
 	}
 	
-	private void doSomethingRandom(){
-		//random movements!
-		Random rand = new Random();
-		int randStatusInt = rand.nextInt(3);
-		switch(randStatusInt){
-			case 0:
-				robotStatus= status.FORWARD;
-				break;
-			case 1:
-				robotStatus = status.LEFT;
-				break;
-			case 2:
-				robotStatus = status.RIGHT;
-				break;
-		}
-	}
-	
-	private void setStatusToGetToNextPathCell(){
-		
-		//decide direction based on popping next cell from path
-		if (!this.path.isEmpty()){
-			Cell nextPathCell = this.path.peek().getPos();
-
-			System.out.println("\tDeciding next action to get from current position " + pos.toString() +" to next path cell " + nextPathCell.toString() + "...");
+	public void updateRobot(RobotWorld world)
+	{
+		if (robotStatus != status.WAITING){
+			
+			//random movements!
+			Random rand = new Random();
+			int randStatusInt = rand.nextInt(3);
+			switch(randStatusInt){
+				case 0:
+					robotStatus= status.FORWARD;
+					break;
+				case 1:
+					robotStatus = status.LEFT;
+					break;
+				case 2:
+					robotStatus = status.RIGHT;
+					break;
+			}
+			
+			/*
+			//decide direction based on popping next cell from path
+			Cell nextPathCell = this.path.pop().getPos();
 			
 			//get the difference between our current position and the next cell in the path (should always be one space!)
-			int colDiff = nextPathCell.getCol() - this.pos.getCol();
-			int rowDiff = nextPathCell.getRow() - this.pos.getRow();
-			
-			System.out.println("\t\tRobot must go Left " + colDiff + " and down " + rowDiff + ".");
+			int colDiff = this.pos.getCol() - nextPathCell.getCol();
+			int rowDiff = this.pos.getRow() - nextPathCell.getRow();
 			
 			//Error checking
 			if (Math.abs(colDiff) > 1 || Math.abs(rowDiff) > 1){
-				System.out.println("ERROR: next path cell is not neightbor" +  this.pos.toString() + " to " + nextPathCell.toString());
+				System.out.println("ERROR: next path cell is not neightbor!");
 			}
 			if (colDiff!=0 && rowDiff !=0){
-				System.out.println("ERROR: next path cell is not cardinal:" + this.pos.toString() + " to " + nextPathCell.toString());
+				System.out.println("ERROR: next path cell is not cardinal.");
 			}
 			
 			// Direction logic
@@ -287,44 +230,26 @@ public class Robot extends Occupant {
 				thetaToGo = 90.0f - theta;
 			}
 			
-			thetaToGo = normalizeAngle(thetaToGo);
-			
 			//normalize thetaToGo to be less than 180deg turns. Stupid angles
-			/*
 			while (thetaToGo > 180.0f){
 				thetaToGo -= 10.0f;
 			}
 			while (thetaToGo < -180.0f){
 				thetaToGo += 180.0f;
 			}
-			*/
-			
-			System.out.println("Robot turn " + thetaToGo + " degrees to face next path cell");
 			
 			if (Math.abs(thetaToGo) <= 45.0f){ //close enough
-			
 				robotStatus = status.FORWARD;
-				System.out.println("Setting "+robotStatus.toString() + " to get to from "+this.pos.toString() +" to next path cell " + nextPathCell.toString());
-
 				//snap theta to nearest standard value
 				setRotation((float)(StandardValues.VALID_HEADING_STEP*((int)(theta+0.5*StandardValues.VALID_HEADING_STEP)/StandardValues.VALID_HEADING_STEP)));
 			}else{
 				robotStatus = (thetaToGo > 45.0f) ? status.RIGHT : status.LEFT;
-				System.out.println("Turning robot "+robotStatus.toString() + " to get to from "+this.pos.toString() +" facing " +getAngleAsString()+ " to next path cell " + nextPathCell.toString());
 			}
-		}else{
-			System.out.println("ERROR: robot tried to find the next action to follow an empty path");
+			*/
 		}
-	}
-	
-	private String getAngleAsString(){
-		return Integer.toString((int)(theta+0.5));
-	}
-	
-	public void updateRobot(RobotWorld world)
-	{		
-		System.out.println("Updating robot now at "+this.pos.toString()+" facing "+getAngleAsString()+"...");
-		// Execute robot status!
+		
+			
+		// Execute!
 		if (robotStatus == status.FORWARD || robotStatus == status.BACKWARD)
 		{
 			try
@@ -339,13 +264,13 @@ public class Robot extends Occupant {
 			turnRobot(robotStatus);
 		} else if (robotStatus == status.WAITING)
 		{
-			System.out.println("...robot waiting...");
+			// TODO: Call check next step function
 		}
 	}
 
+	
 	public void interpolateRobot(RobotWorld world, float amount)
 	{
-		/*
 		if (robotStatus == status.FORWARD || robotStatus == status.BACKWARD)
 		{
 			int directionSign = (robotStatus == status.FORWARD) ? 1 : -1;
@@ -366,7 +291,6 @@ public class Robot extends Occupant {
 			//setRotation(theta+directionSign*StandardValues.VALID_HEADING_STEP*amount);
 			img.setRotation(theta+directionSign*StandardValues.VALID_HEADING_STEP*amount);
 		}
-		*/
 	}
 
 	public String ListOfAStarCellsToString(List<astarCell> a){
@@ -407,8 +331,6 @@ public class Robot extends Occupant {
 		if(this.path == null)
 		{
 			throw new noPathFoundException(); 
-		}else{
-			System.out.println("\tA* found path from current posititon " + this.pos + " to goal " + this.curGoal + "\n" + ListOfAStarCellsToString(this.path));
 		}
 
 	}
@@ -537,6 +459,7 @@ public class Robot extends Occupant {
 		System.out.println("Robot "+ this.ID + " fixed!");
 		DataLogger.getDataLogger().log("Robot " + this.ID + " fixed", SimTimer.getCurTime());
 	}
+
 	
 	public Cell getGoal() {
 		return curGoal;

@@ -13,7 +13,7 @@ public class RobotWorld {
 	User user;
 	
 	//robots
-	private int nRobots = 1;//Robot.nPossibleRobotColors;
+	private int nRobots = Robot.nPossibleRobotColors;
 	private Robot[] robots;
 	
 	//obstacles
@@ -124,8 +124,8 @@ public class RobotWorld {
 		Cell goal = getRandomUnusedGoal(id);		//make a random goal
 		
 		//create the robot
-		Robot robot =  new Robot(randPos,theta, intelligence, id, this);
-		robot.setNewGoal(goal, this);
+		Robot robot =  new Robot(randPos,theta, goal, intelligence, id, this);
+		
 		return robot;
 	}
 	
