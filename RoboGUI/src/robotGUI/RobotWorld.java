@@ -13,7 +13,7 @@ public class RobotWorld {
 	User user;
 	
 	//robots
-	private int nRobots = Robot.nPossibleRobotColors;
+	private int nRobots = 1; //Robot.nPossibleRobotColors;
 	private Robot[] robots;
 	
 	//obstacles
