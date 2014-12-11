@@ -12,15 +12,12 @@ import robotGenericValues.status;
 import robotPathPlanning.astarCell;
 
 import javax.imageio.ImageIO;
-
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Random;
 import java.util.Stack;
 
 import com.ibm.icu.impl.ReplaceableUCharacterIterator;
@@ -41,7 +38,7 @@ public class Robot extends Occupant {
 
 	// status
 	private status			robotStatus;
-	
+
 	TransparentRotatedImage	img;
 	private int renderY;
 	private int renderX;
@@ -65,7 +62,7 @@ public class Robot extends Occupant {
 		this.intelligence = intelligence;
 		this.robotStatus = status.FORWARD;
 		this.ID = id;
-		System.out.println("Making new robot "+ID+" with position (" + c.getCol()
+		System.out.println("Making new robot with position (" + c.getCol()
 				+ "," + c.getRow() + ") theta = " + theta + " intelligence="
 				+ intelligence + ".");
 
@@ -91,26 +88,28 @@ public class Robot extends Occupant {
 
 	public void turnRobot(status turnStatus)
 	{
-		setRotation(theta + ((turnStatus == status.LEFT)?1:-1)*StandardValues.VALID_HEADING_STEP);
+		float angle = this.theta;
+		if (turnStatus == status.LEFT)
+		{
+			angle += StandardValues.DELTA_THETA;
+		} else if (turnStatus == status.RIGHT)
+		{
+			angle -= StandardValues.DELTA_THETA;
+		}
+		setRotation(angle);
 	}
 
-	private float angleNormalize(float angle){
-		while (angle >= 360)
-		{
-			angle -= 360.0f;
-		}
-		while (angle < 0)
-		{
-			angle += 360.0f;
-		}
-		return angle;
-	}
 	private void setRotation(float angle)
 	{
-		this.theta = angleNormalize(angle);
-//		if (Math.abs(theta % StandardValues.VALID_HEADING_STEP) > 0.1f){
-//			System.out.println("ERROR: set angle to non 90-deg increment!");
-//		}
+		this.theta = angle;
+		while (theta >= 360)
+		{
+			theta -= 360.0f;
+		}
+		while (theta < 0)
+		{
+			theta += 360.0f;
+		}
 		img.setRotation(theta);
 	}
 
@@ -118,18 +117,12 @@ public class Robot extends Occupant {
 	{
 		// System.out.println("\t\t\tMoving Robot " + moveStatus.toString());
 
-		if (Math.abs(theta % StandardValues.VALID_HEADING_STEP) > 5.0f)
+		if (theta % StandardValues.VALID_HEADING_STEP != 0)
 		{
 			throw new InvalidHeadingException(
 					"Cannot move robot when theta is " + theta + ".");
 		} else
 		{
-			//snap theta
-			this.setRotation(90+ StandardValues.VALID_HEADING_STEP * ((int)(theta+StandardValues.VALID_HEADING_STEP/2)/StandardValues.VALID_HEADING_STEP));
-			if (Math.abs(theta % StandardValues.VALID_HEADING_STEP) > 0.1f){
-				System.out.println("ERROR: set angle to non 90-deg increment!");
-			}
-			
 			int directionSign = (robotStatus == status.FORWARD) ? 1 : -1;
 			int newRow = this.pos.getRow();
 			int newCol = this.pos.getCol();
@@ -179,77 +172,10 @@ public class Robot extends Occupant {
 		this.renderGoalX = Math.round((this.curGoal.getCol()+0.5f) * world.getColSpace()-GOAL_WIDTH/2.0f);
 		this.renderGoalY = Math.round((this.curGoal.getRow()+0.5f) * world.getRowSpace()-GOAL_WIDTH/2.0f);
 	}
-	
+
 	public void updateRobot(RobotWorld world)
 	{
-		if (robotStatus != status.WAITING){
-			
-			//random movements!
-			Random rand = new Random();
-			int randStatusInt = rand.nextInt(3);
-			switch(randStatusInt){
-				case 0:
-					robotStatus= status.FORWARD;
-					break;
-				case 1:
-					robotStatus = status.LEFT;
-					break;
-				case 2:
-					robotStatus = status.RIGHT;
-					break;
-			}
-			
-			/*
-			//decide direction based on popping next cell from path
-			Cell nextPathCell = this.path.pop().getPos();
-			
-			//get the difference between our current position and the next cell in the path (should always be one space!)
-			int colDiff = this.pos.getCol() - nextPathCell.getCol();
-			int rowDiff = this.pos.getRow() - nextPathCell.getRow();
-			
-			//Error checking
-			if (Math.abs(colDiff) > 1 || Math.abs(rowDiff) > 1){
-				System.out.println("ERROR: next path cell is not neightbor!");
-			}
-			if (colDiff!=0 && rowDiff !=0){
-				System.out.println("ERROR: next path cell is not cardinal.");
-			}
-			
-			// Direction logic
-			float thetaToGo = 0.0f;
-			if (colDiff <= -1){	//going WEST (theta of 180)
-				thetaToGo = 180.0f - theta;
-				
-			}else if (colDiff >= 1){ //Going EAST (theta at 0=360)
-				thetaToGo = 0.0f - theta;
-				
-			}else if (rowDiff <= -1){ //going SOUTH (theta of 270)
-				thetaToGo = 270.0f - theta; 
-				
-			}else if (rowDiff >= 1){ //going NORTH (theta of 90)
-				thetaToGo = 90.0f - theta;
-			}
-			
-			//normalize thetaToGo to be less than 180deg turns. Stupid angles
-			while (thetaToGo > 180.0f){
-				thetaToGo -= 10.0f;
-			}
-			while (thetaToGo < -180.0f){
-				thetaToGo += 180.0f;
-			}
-			
-			if (Math.abs(thetaToGo) <= 45.0f){ //close enough
-				robotStatus = status.FORWARD;
-				//snap theta to nearest standard value
-				setRotation((float)(StandardValues.VALID_HEADING_STEP*((int)(theta+0.5*StandardValues.VALID_HEADING_STEP)/StandardValues.VALID_HEADING_STEP)));
-			}else{
-				robotStatus = (thetaToGo > 45.0f) ? status.RIGHT : status.LEFT;
-			}
-			*/
-		}
-		
-			
-		// Execute!
+
 		if (robotStatus == status.FORWARD || robotStatus == status.BACKWARD)
 		{
 			try
@@ -268,7 +194,6 @@ public class Robot extends Occupant {
 		}
 	}
 
-	
 	public void interpolateRobot(RobotWorld world, float amount)
 	{
 		if (robotStatus == status.FORWARD || robotStatus == status.BACKWARD)
@@ -287,22 +212,11 @@ public class Robot extends Occupant {
 			this.img.setPosition(x, y);
 		} else if (robotStatus == status.LEFT || robotStatus == status.RIGHT)
 		{
-			int directionSign = (robotStatus == status.RIGHT) ? 1 : -1;
-			//setRotation(theta+directionSign*StandardValues.VALID_HEADING_STEP*amount);
-			img.setRotation(theta+directionSign*StandardValues.VALID_HEADING_STEP*amount);
+			// int directionSign = (robotStatus == status.RIGHT) ? 1 : -1;
+			// setRotation(theta+directionSign*90*amount);
 		}
 	}
 
-	public String ListOfAStarCellsToString(List<astarCell> a){
-		String s = "List<astarCell> length " + a.size()+"\n";
-		ListIterator<astarCell> iter = a.listIterator();
-		while (iter.hasNext()){
-			astarCell cell = iter.next();
-			s+="\t"+cell.getPos().toString()+" "+cell.getCost(curGoal)+ "\n";
-		}
-		return s;
-	}
-	
 	public void Astar(RobotWorld world) throws noPathFoundException
 	{
 		this.path = null; 
@@ -310,12 +224,12 @@ public class Robot extends Occupant {
 		List<astarCell> closedCells = new ArrayList<astarCell>();
 		openCells.add(new astarCell(pos));
 
-		while (!openCells.isEmpty()) //while there are any cells left to explore on the empty list
+		while (!openCells.isEmpty())
 		{
-			astarCell q = findLeastCostNode(openCells); //get the one with the least F value
-			if(q.equals(new astarCell(curGoal)))		//if that cell is the goal
+			astarCell q = findLeastCostNode(openCells);
+			if(q.equals(new astarCell(curGoal)))
 			{
-				setPath(q);	//set the path to the goal and exit
+				setPath(q); 
 				break;
 			}
 			
@@ -458,11 +372,6 @@ public class Robot extends Occupant {
 		//TODO: the user clicked on this robot to fix it. Fix it
 		System.out.println("Robot "+ this.ID + " fixed!");
 		DataLogger.getDataLogger().log("Robot " + this.ID + " fixed", SimTimer.getCurTime());
-	}
-
-	
-	public Cell getGoal() {
-		return curGoal;
 	}
 
 }
