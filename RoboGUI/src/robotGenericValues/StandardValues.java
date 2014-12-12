@@ -11,4 +11,8 @@ public class StandardValues {
 	
 	public final static float MAX_USER_FIXING_ABILITY = 100.0f;
 	public final static float COST_TO_FIX_ROBOT = 10.0f;
+	public final static float NORTH_THETA = 270.0f;
+	public final static float SOUTH_THETA = 90.0f; 
+	public final static float EAST_THETA = 0.0f;
+	public final static float WEST_THETA = 180.0f;
 }

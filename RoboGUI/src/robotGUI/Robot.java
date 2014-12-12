@@ -12,8 +12,10 @@ import robotGenericValues.status;
 import robotPathPlanning.astarCell;
 
 import javax.imageio.ImageIO;
+import javax.sql.rowset.WebRowSet;
 
 import java.awt.*;
+import java.awt.font.TextHitInfo;
 import java.awt.geom.Ellipse2D;
 import java.io.File;
 import java.io.IOException;
@@ -107,13 +109,25 @@ public class Robot extends Occupant {
 	}
 
 	private float normalizeAngle(float angle){
-		while (angle >= 360)
+		while (angle > 360)
 		{
 			angle -= 360.0f;
 		}
-		while (angle < 0)
+		while (angle < -0)
 		{
 			angle += 360.0f;
+		}
+		return angle;
+	}
+	
+	private float normalizeAngleNeg(float angle){
+		while (angle > 180)
+		{
+			angle -= 180.0f;
+		}
+		while (angle < -180)
+		{
+			angle += 180.0f;
 		}
 		return angle;
 	}
@@ -272,22 +286,23 @@ public class Robot extends Occupant {
 				System.out.println("ERROR: next path cell is not cardinal:" + this.pos.toString() + " to " + nextPathCell.toString());
 			}
 			
-			// Direction logic
+			// Direction logic			
 			float thetaToGo = 0.0f;
-			if (colDiff <= -1){	//going WEST (theta of 180)
-				thetaToGo = 180.0f - theta;
+			if (colDiff == -1){	//going WEST (theta of 180)
+				thetaToGo = StandardValues.WEST_THETA - theta;
+			}else if (colDiff == 1){ //Going EAST (theta at 0=360)
+					thetaToGo = StandardValues.EAST_THETA - theta;
 				
-			}else if (colDiff >= 1){ //Going EAST (theta at 0=360)
-				thetaToGo = 0.0f - theta;
+			}else if (rowDiff == 1){ //going SOUTH (theta of 90)
+				thetaToGo = StandardValues.SOUTH_THETA -  theta; 
 				
-			}else if (rowDiff <= -1){ //going SOUTH (theta of 270)
-				thetaToGo = 270.0f - theta; 
-				
-			}else if (rowDiff >= 1){ //going NORTH (theta of 90)
-				thetaToGo = 90.0f - theta;
+			}else if (rowDiff == -1){ //going NORTH (theta of 270)
+				thetaToGo = StandardValues.NORTH_THETA - theta;
 			}
+
 			
-			thetaToGo = normalizeAngle(thetaToGo);
+			//thetaToGo = normalizeAngle(thetaToGo);
+			thetaToGo = normalizeAngleNeg(thetaToGo);
 			
 			//normalize thetaToGo to be less than 180deg turns. Stupid angles
 			/*
@@ -301,7 +316,7 @@ public class Robot extends Occupant {
 			
 			System.out.println("Robot turn " + thetaToGo + " degrees to face next path cell");
 			
-			if (Math.abs(thetaToGo) <= 45.0f){ //close enough
+			if (Math.abs(thetaToGo) <= 45.0f && Math.abs(thetaToGo) >= -45.0f){ //close enough
 			
 				robotStatus = status.FORWARD;
 				System.out.println("Setting "+robotStatus.toString() + " to get to from "+this.pos.toString() +" to next path cell " + nextPathCell.toString());
@@ -309,7 +324,7 @@ public class Robot extends Occupant {
 				//snap theta to nearest standard value
 				setRotation((float)(StandardValues.VALID_HEADING_STEP*((int)(theta+0.5*StandardValues.VALID_HEADING_STEP)/StandardValues.VALID_HEADING_STEP)));
 			}else{
-				robotStatus = (thetaToGo > 45.0f) ? status.RIGHT : status.LEFT;
+				robotStatus = (thetaToGo < -45.0f) ? status.RIGHT : status.LEFT;
 				System.out.println("Turning robot "+robotStatus.toString() + " to get to from "+this.pos.toString() +" facing " +getAngleAsString()+ " to next path cell " + nextPathCell.toString());
 			}
 		}else{
@@ -345,7 +360,6 @@ public class Robot extends Occupant {
 
 	public void interpolateRobot(RobotWorld world, float amount)
 	{
-		/*
 		if (robotStatus == status.FORWARD || robotStatus == status.BACKWARD)
 		{
 			int directionSign = (robotStatus == status.FORWARD) ? 1 : -1;
@@ -364,9 +378,9 @@ public class Robot extends Occupant {
 		{
 			int directionSign = (robotStatus == status.RIGHT) ? 1 : -1;
 			//setRotation(theta+directionSign*StandardValues.VALID_HEADING_STEP*amount);
-			img.setRotation(theta+directionSign*StandardValues.VALID_HEADING_STEP*amount);
+			img.setRotation(theta-directionSign*StandardValues.VALID_HEADING_STEP*amount);
 		}
-		*/
+	
 	}
 
 	public String ListOfAStarCellsToString(List<astarCell> a){
