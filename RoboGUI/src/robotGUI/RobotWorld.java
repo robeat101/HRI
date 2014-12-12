@@ -13,7 +13,7 @@ public class RobotWorld {
 	User user;
 	
 	//robots
-	private int nRobots = 1;//Robot.nPossibleRobotColors;
+	private int nRobots = Robot.nPossibleRobotColors;
 	private Robot[] robots;
 	
 	//obstacles
@@ -209,7 +209,7 @@ public class RobotWorld {
 		Occupant currOccupant = getOccupant(new Cell(cellX, cellY));
 		if (currOccupant != null){
 			if (currOccupant instanceof Robot){
-				user.fixRobot((Robot)currOccupant);
+				user.fixRobot((Robot)currOccupant, this);
 			}
 		}
 	}

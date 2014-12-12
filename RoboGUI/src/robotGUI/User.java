@@ -22,9 +22,9 @@ public class User {
 		indicator.repaint();
 	}
 
-	public void fixRobot(Robot curOccupant) {
+	public void fixRobot(Robot curOccupant, RobotWorld world) {
 		if (fixingAbility>StandardValues.COST_TO_FIX_ROBOT){
-			curOccupant.fix();
+			curOccupant.fix(world);
 			fixingAbility-=StandardValues.COST_TO_FIX_ROBOT;
 		}
 	}

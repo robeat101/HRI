@@ -567,7 +567,8 @@ public class Robot extends Occupant {
 
 	}
 	
-	public void fix(){
+	public void fix(RobotWorld world){
+		this.setNewGoal(world);
 		//TODO: the user clicked on this robot to fix it. Fix it
 		System.out.println("Robot "+ this.ID + " fixed!");
 		DataLogger.getDataLogger().log("Robot " + this.ID + " fixed", SimTimer.getCurTime());
