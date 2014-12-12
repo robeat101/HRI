@@ -39,6 +39,9 @@ public class Robot extends Occupant {
 	// goals
 	private Cell			curGoal;
 	private Stack<astarCell>			path;
+	
+	//Score
+	private int score = 0; 
 
 
 	// status
@@ -58,18 +61,19 @@ public class Robot extends Occupant {
 	//goal
 	private static final int GOAL_WIDTH = 20;
 	
-	public void setNewGoal(Cell curGoal, RobotWorld world){
+	public void setNewGoal(RobotWorld world){
+		this.curGoal = world.getRandomUnoccupiedCell();
 		System.out.println("Setting robot " + this.ID + " goal to " + curGoal.toString());
-		this.curGoal = curGoal;
 		this.recalcGoalRenderPosition(world);
 		try{
 			this.Astar(world);
+			setStatusToGetToNextPathCell(); 
 		}
 		catch(noPathFoundException e)
 		{
-			e.printStackTrace();
+			this.robotStatus = status.NOPATH;
 		}
-		setStatusToGetToNextPathCell(); 
+
 	}
 	
 	public Robot(Cell c, int theta, float intelligence, int id,
@@ -327,7 +331,13 @@ public class Robot extends Occupant {
 				robotStatus = (thetaToGo < -45.0f) ? status.RIGHT : status.LEFT;
 				System.out.println("Turning robot "+robotStatus.toString() + " to get to from "+this.pos.toString() +" facing " +getAngleAsString()+ " to next path cell " + nextPathCell.toString());
 			}
-		}else{
+		}else if(curGoal.getCol() == pos.getCol() && curGoal.getRow() == pos.getRow())
+		{
+			System.out.println("REACHED GOAL!!");
+			this.robotStatus = status.REACHEDGOAL;
+		}
+		else
+		{
 			System.out.println("ERROR: robot tried to find the next action to follow an empty path");
 		}
 	}
@@ -338,6 +348,13 @@ public class Robot extends Occupant {
 	
 	public void updateRobot(RobotWorld world)
 	{		
+		
+		if(curGoal.equals(pos))
+		{
+			this.score += StandardValues.SCORE_GOAL_VALUE;
+			world.Score += StandardValues.SCORE_GOAL_VALUE;
+			this.robotStatus = status.REACHEDGOAL;
+		}
 		System.out.println("Updating robot now at "+this.pos.toString()+" facing "+getAngleAsString()+"...");
 		// Execute robot status!
 		if (robotStatus == status.FORWARD || robotStatus == status.BACKWARD)
@@ -355,6 +372,10 @@ public class Robot extends Occupant {
 		} else if (robotStatus == status.WAITING)
 		{
 			System.out.println("...robot waiting...");
+		}
+		else if(robotStatus == status.REACHEDGOAL)
+		{
+			this.setNewGoal(world);
 		}
 	}
 

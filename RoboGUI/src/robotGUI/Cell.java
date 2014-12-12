@@ -37,4 +37,9 @@ public class Cell {
 	public String toString(){
 		return "["+Integer.toString(this.col)+", "+Integer.toString(this.row)+"]";
 	}
+	
+	public boolean equals(Cell cell)
+	{
+		return this.getCol() == cell.getCol() && this.getRow() == cell.getRow();
+	}
 }

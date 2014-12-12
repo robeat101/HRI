@@ -27,6 +27,7 @@ public class RobotWorld {
 	private int cols;
 	private float rowSpace;
 	private float colSpace;
+	public int Score; 
 	Occupant grid[][];
 	
 	//private JPanel renderPanel;
@@ -39,6 +40,7 @@ public class RobotWorld {
 		colSpace = (float)WIDTH/(float)rows;
 		rowSpace = (float)HEIGHT/(float)cols;
 		System.out.println("Making RobotWorld of "+cols+"X"+rows+" cells each size "+colSpace+"x"+rowSpace+".");
+		Score = 0;
 		
 		//make user
 		user = new User();
@@ -108,30 +110,22 @@ public class RobotWorld {
 		}
 		return false;
 	}
-	private Cell getRandomUnusedGoal(int curMaxRobots){
-		Cell trialGoal = getRadomUnoccupiedCell();
-		while (isAUsedGoal(trialGoal, curMaxRobots)){
-			trialGoal = getRadomUnoccupiedCell();
-		}
-		return trialGoal;
-	}
 	
 	private Robot makeRandomRobot(int id){
 		Random rn = new Random();
 		
-		Cell randPos = getRadomUnoccupiedCell();	//make a random unoccupied position
+		Cell randPos = getRandomUnoccupiedCell();	//make a random unoccupied position
 		float intelligence = rn.nextFloat();		//make a random intelligence
 		int theta = rn.nextInt(3)*StandardValues.VALID_HEADING_STEP;				//make a random rotation theta
-		Cell goal = getRandomUnusedGoal(id);		//make a random goal
 		
 		//create the robot
 		Robot robot =  new Robot(randPos,theta, intelligence, id, this);
-		robot.setNewGoal(goal, this);
+		robot.setNewGoal(this);
 		return robot;
 	}
 	
 	private Obstacle makeRandomObstacle(){
-		Cell randPos = getRadomUnoccupiedCell();	//make a random unoccupied position
+		Cell randPos = getRandomUnoccupiedCell();	//make a random unoccupied position
 		return new Obstacle(randPos, this);
 	}
 	
@@ -160,7 +154,7 @@ public class RobotWorld {
 	/**
 	 * Returns a random unoccupied point
 	 */
-	public Cell getRadomUnoccupiedCell(){
+	public Cell getRandomUnoccupiedCell(){
 		Random rn = new Random();
 		
 		//make a random unoccupied position
