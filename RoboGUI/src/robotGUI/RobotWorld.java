@@ -50,8 +50,9 @@ public class RobotWorld {
 				grid[c][r]=null;
 			}
 		}
-		makeRobots();
+		
 		makeObstacles();
+		makeRobots();
 		
 		DataLogger.initDataLogger();
 	}
