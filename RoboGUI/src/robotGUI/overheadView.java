@@ -5,32 +5,17 @@
 
 package robotGUI;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.RenderingHints;
-import java.awt.Transparency;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
-import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageOp;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
-import java.io.IOException;
 
-import javax.imageio.ImageIO;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
-import javax.swing.AbstractAction;
 
+
+@SuppressWarnings("serial")
 public class overheadView extends JPanel implements MouseListener{
 
 	Graphics2D g2d;

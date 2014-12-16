@@ -10,12 +10,8 @@ import robotExceptions.noPathFoundException;
 import robotGenericValues.StandardValues;
 import robotGenericValues.status;
 import robotPathPlanning.astarCell;
-
 import javax.imageio.ImageIO;
-import javax.sql.rowset.WebRowSet;
-
 import java.awt.*;
-import java.awt.font.TextHitInfo;
 import java.awt.geom.Ellipse2D;
 import java.io.File;
 import java.io.IOException;
@@ -24,8 +20,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
 import java.util.Stack;
-
-import com.ibm.icu.impl.ReplaceableUCharacterIterator;
 
 public class Robot extends Occupant {
 	private int				ID;
@@ -562,7 +556,7 @@ public class Robot extends Occupant {
 		this.setNewGoal(world);
 		//TODO: the user clicked on this robot to fix it. Fix it
 		System.out.println("Robot "+ this.ID + " fixed!");
-		DataLogger.getDataLogger().log("Robot " + this.ID + " fixed", SimTimer.getCurTime());
+		DataLogger.getDataLogger().log("Robot " + this.ID + " fixed, score:" + this.score, SimTimer.getCurTime());
 	}
 	
 	public Cell getGoal() {

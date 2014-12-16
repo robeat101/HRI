@@ -6,7 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
+
 
 public class DataLogger {
 	private static final String dataLogBaseName = "HRI_sim_log_";

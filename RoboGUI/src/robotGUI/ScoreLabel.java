@@ -8,6 +8,7 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
 
+@SuppressWarnings("serial")
 public class ScoreLabel extends JLabel {
 
 	public ScoreLabel(){

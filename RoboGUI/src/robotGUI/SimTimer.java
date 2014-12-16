@@ -12,6 +12,7 @@ import javax.swing.Timer;
 import robotGenericValues.StandardValues;
 
 
+@SuppressWarnings("serial")
 public class SimTimer extends Timer {
 
 	private static SimTimer theSimTimer;
@@ -20,6 +21,7 @@ public class SimTimer extends Timer {
 	}
 	
 	private long time = 0;
+	@SuppressWarnings("unused")
 	private final static int interpolationsPerTimeStep = StandardValues.DELTA_TIME/StandardValues.DELTA_TIME_INTERPOLATE;
 	
 	ActionListener augmentedActionListener;

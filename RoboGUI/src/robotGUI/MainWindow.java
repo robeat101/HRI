@@ -6,7 +6,6 @@ import javax.swing.JFrame;
 import javax.swing.JProgressBar;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 
 public class MainWindow{
 	
@@ -64,9 +63,7 @@ public class MainWindow{
 	//
 	private void initialize() {
 		int side = 900;
-		int width = 0;
-		int height = 0;
-		
+
 		frame = new JFrame();
 		frame.setBackground(Color.GRAY);
 		frame.setBounds(0,0,side, side);
