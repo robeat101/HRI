@@ -97,7 +97,6 @@ public class MainWindow{
 		frame.getContentPane().add(rechargeIndicator, BorderLayout.EAST);
 		
 		ScoreLabel scoreIndicator = new ScoreLabel();
-		scoreIndicator.setMinimumSize(new Dimension(scoreIndicator.getMinimumSize().width, 500));
 		frame.getContentPane().add(scoreIndicator, BorderLayout.NORTH);
 		
 		/*

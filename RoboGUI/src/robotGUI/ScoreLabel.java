@@ -14,19 +14,21 @@ public class ScoreLabel extends JLabel {
 		super();
 		Font f = new Font("OCR Extended", Font.BOLD, 500);
 		this.setOpaque(true);
-		this.setSize(this.getWidth(), 300);
+		this.setSize(this.getWidth(), 500);
 		this.setBackground(Color.DARK_GRAY);
 		this.setForeground(Color.GREEN);
 		
 		this.setHorizontalAlignment(SwingConstants.CENTER);
-
-		this.setMinimumSize(new Dimension(getMinimumSize().width, 300));
+		int height = 50;
+		Dimension size = new Dimension(getSize().width, height);
+		this.setMinimumSize(size);
+		this.setPreferredSize(size);
+		this.setSize(size);
 		//this.setVerticalAlignment(SwingConstants.CENTER);
 	}
 	
 	public void setScore(int n){
-		this.setText(Integer.toString(n));
-		//String.format("%08d", 
+		this.setText(String.format("%08d",n));
 	}
 	
 }

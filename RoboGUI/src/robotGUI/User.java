@@ -34,7 +34,7 @@ public class User {
 	public void setIndicators(JProgressBar fixInd, ScoreLabel scoreInd) {
 		this.fixIndicator=fixInd;
 		this.scoreIndicator = scoreInd;
-		this.scoreIndicator.setScore(1);
+		this.scoreIndicator.setScore(0);
 	}
 
 }

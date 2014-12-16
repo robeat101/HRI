@@ -43,7 +43,6 @@ public class Robot extends Occupant {
 	//Score
 	private int score = 0; 
 
-
 	// status
 	private status			robotStatus;
 	
@@ -125,14 +124,16 @@ public class Robot extends Occupant {
 	}
 	
 	private float normalizeAngleNeg(float angle){
+		System.out.print("\t\tNormalizing angle to go from " + angle);
 		while (angle > 180)
 		{
-			angle -= 180.0f;
+			angle -= 360.0f;
 		}
 		while (angle < -180)
 		{
-			angle += 180.0f;
+			angle += 360f;
 		}
+		System.out.println(" to "+angle);
 		return angle;
 	}
 	
@@ -307,17 +308,7 @@ public class Robot extends Occupant {
 			
 			//thetaToGo = normalizeAngle(thetaToGo);
 			thetaToGo = normalizeAngleNeg(thetaToGo);
-			
-			//normalize thetaToGo to be less than 180deg turns. Stupid angles
-			/*
-			while (thetaToGo > 180.0f){
-				thetaToGo -= 10.0f;
-			}
-			while (thetaToGo < -180.0f){
-				thetaToGo += 180.0f;
-			}
-			*/
-			
+						
 			System.out.println("Robot turn " + thetaToGo + " degrees to face next path cell");
 			
 			if (Math.abs(thetaToGo) <= 45.0f && Math.abs(thetaToGo) >= -45.0f){ //close enough
