@@ -67,7 +67,7 @@ public class MainWindow{
 	// Initialize the contents of the frame.
 	//
 	private void initialize() {
-		int side = 900;
+		int side = 800;
 
 		frame = new JFrame();
 		frame.setBackground(Color.GRAY);

@@ -30,6 +30,9 @@ public class Robot extends Occupant {
 	// behavior
 	private float			intelligence;
 	public static final float[] intelligences = {1.0f, 0.95f, 0.9f, 0.8f, 0.5f, 0.4f};
+	private static final float addedIntelligenceFromFix = 1.00f;
+	private static final float intelligenceDecayPerStep = 0.25f;
+	private float intelligenceAdder = 0.0f;
 	
 	// goals
 	private Cell			curGoal;
@@ -56,7 +59,7 @@ public class Robot extends Occupant {
 	
 	//goal
 	private static final int GOAL_WIDTH = 20;
-	private static final int ALERT_WIDTH = 30;
+	private static final int ALERT_WIDTH = 15;
 	
 	public void setNewGoal(RobotWorld world){
 		this.curGoal = world.getRandomUnoccupiedCell();
@@ -356,14 +359,10 @@ public class Robot extends Occupant {
 			this.reachedGoal(world);
 		}
 		
-		// confuse the unintelligent!
-		Random confusion = new Random();
-		if (confusion.nextFloat() >= intelligence){ //the greater the intelligence, the less the probability of confusion
-			this.robotStatus = status.CONFUSED;
-			System.out.println("Robot " + this.ID + " got confused!");
-			//this.doSomethingRandom(); //make a random status
-		}
-				
+
+		
+
+		//update on this timestep to complete the current move and determine the next one.		
 		System.out.println("Updating robot now at "+this.pos.toString()+" facing "+getAngleAsString()+"...");
 		// Execute robot status!
 		if (robotStatus == status.FORWARD || robotStatus == status.BACKWARD){
@@ -381,11 +380,27 @@ public class Robot extends Occupant {
 		}else if (robotStatus == status.COLLISION){
 			followNewPath(world);
 		}else if (robotStatus == status.NOPATH){
-			setNewGoal(world); //keep rying to get new goals.
+			setNewGoal(world); //keep trying to get new goals.
 		}
 		else if(robotStatus == status.REACHEDGOAL)
 		{
 			this.setNewGoal(world); //get a new goal!
+		}
+		
+		// confuse the unintelligent (for the next timestep)!
+		Random confusion = new Random();
+		if (confusion.nextFloat() >= intelligence + intelligenceAdder){ //the greater the intelligence, the less the probability of confusion
+			this.robotStatus = status.CONFUSED;
+			System.out.println("Robot " + this.ID + " got confused!");
+			//this.doSomethingRandom(); //make a random status
+		}
+		
+		//decline added intelligence over time
+		if (intelligenceAdder>0.0f){
+			intelligenceAdder-=intelligenceDecayPerStep;
+			if (intelligenceAdder<0.0f){
+				intelligenceAdder=0.0f;
+			}
 		}
 	}
 
@@ -583,24 +598,28 @@ public class Robot extends Occupant {
 		if (robotStatus == status.CONFUSED){
 			
 			Point thisRobotsRenderPosition = this.img.getRenderPosition();
-			double alertX= thisRobotsRenderPosition.getX()-ALERT_WIDTH/2.0f+RobotWorld.getCellWidth()/2.0f;
-			double alertY = thisRobotsRenderPosition.getY()-ALERT_WIDTH/2.0f+RobotWorld.getCellHeight()/2.0f;
-			circle = new Ellipse2D.Double(alertX, alertY, ALERT_WIDTH, ALERT_WIDTH);
+			double alertX= thisRobotsRenderPosition.getX()+RobotWorld.getCellWidth()/2.0f;
+			double alertY = thisRobotsRenderPosition.getY()+RobotWorld.getCellHeight()/2.0f;
+			circle = new Ellipse2D.Double(alertX-ALERT_WIDTH/2.0f, alertY-ALERT_WIDTH/2.0f, ALERT_WIDTH, ALERT_WIDTH);
 			g2d.setColor(Color.BLACK);
 			g2d.fill(circle);
 			g2d.draw(circle);
 			
-			g2d.setColor(Color.YELLOW);
-			char[] strAlert = {'!'};
-			final int charOffsetX = 15;
-			final int charOffsetY = 20;
-			g2d.drawChars(strAlert, 0, 1, (int)Math.round(alertX)+charOffsetX, (int)Math.round(alertY)+charOffsetY);
+			if (SimTimer.getCurTime()%2==0){
+				g2d.setColor(Color.YELLOW);
+				char[] strAlert = {'!'};
+				final int charOffsetX = 0;//15;
+				final int charOffsetY = 5;
+				g2d.drawChars(strAlert, 0, 1, (int)Math.round(alertX)+charOffsetX, (int)Math.round(alertY)+charOffsetY);
+			}
 		}
 	}
 	
+	//TODO: the user clicked on this robot to fix it. Fix it!
+	
 	public void fix(RobotWorld world){
-		this.setNewGoal(world);
-		//TODO: the user clicked on this robot to fix it. Fix it
+		//this.setNewGoal(world);
+		intelligenceAdder = addedIntelligenceFromFix;
 		System.out.println("Robot "+ this.ID + " fixed!");
 		this.followNewPath(world); //find a new way to get there!
 		DataLogger.getDataLogger().log("Robot " + this.ID + " fixed, score:" + this.score, SimTimer.getCurTime());
