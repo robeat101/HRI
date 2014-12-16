@@ -4,8 +4,13 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JProgressBar;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.Toolkit;
 
 public class MainWindow{
 	
@@ -101,6 +106,12 @@ public class MainWindow{
 		frame.setVisible(true);
 
 		overheadViewPanel.setUserIndicators(rechargeIndicator, scoreIndicator);
+		
+		//change cursor
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		Image mouseImage = toolkit.getImage("images/wrench.png");
+		Cursor cursor = toolkit.createCustomCursor(mouseImage, new Point(frame.getX(), frame.getY()), "img");
+		frame.setCursor(cursor);
 	}
 	
 }
