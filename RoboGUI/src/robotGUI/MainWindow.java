@@ -3,36 +3,14 @@ package robotGUI;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
-
-import java.awt.BorderLayout;
-
-import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 import javax.swing.JProgressBar;
-import javax.swing.JTextField;
-import javax.swing.JRadioButton;
-import javax.swing.JCheckBox;
-import javax.swing.JPanel;
-import javax.swing.Timer;
-
-import robotGenericValues.StandardValues;
-
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-//drawing on panels
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.Transparency;
-import java.awt.event.ActionEvent;
-import java.awt.image.BufferedImage;
 
 public class MainWindow{
 	
 	private JFrame frame;
-	private JTextField txtSomeTextHere;
-	private JCheckBox chckbxControlSomething;
 	private overheadView overheadViewPanel;
     
 //	private Timer timer = new Timer(StandardValues.DELTA_TIME_INTERPOLATE, new AbstractAction() {
@@ -86,6 +64,9 @@ public class MainWindow{
 	//
 	private void initialize() {
 		int side = 900;
+		int width = 0;
+		int height = 0;
+		
 		frame = new JFrame();
 		frame.setBackground(Color.GRAY);
 		frame.setBounds(0,0,side, side);
@@ -98,7 +79,7 @@ public class MainWindow{
 		
 		ScoreLabel scoreIndicator = new ScoreLabel();
 		frame.getContentPane().add(scoreIndicator, BorderLayout.NORTH);
-		
+				
 		/*
 		JLabel lblHello = new JLabel("Hello, welcome to robot world");
 		frame.getContentPane().add(lblHello, BorderLayout.NORTH);
@@ -117,9 +98,11 @@ public class MainWindow{
 		overheadViewPanel = new overheadView();
 		overheadViewPanel.setBackground(Color.WHITE);		
 		frame.getContentPane().add(overheadViewPanel, BorderLayout.CENTER);
-		frame.setResizable(false);
+		
+		frame.setResizable(true);
 		frame.pack();
 		frame.setVisible(true);
+
 		overheadViewPanel.setUserIndicators(rechargeIndicator, scoreIndicator);
 	}
 	
