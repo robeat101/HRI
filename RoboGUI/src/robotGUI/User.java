@@ -12,7 +12,8 @@ public class User {
 	JProgressBar fixIndicator;
 	ScoreLabel scoreIndicator;
 	
-	public void update() {
+	public void update(RobotWorld world) {
+		this.scoreIndicator.setScore(world.Score);
 		if (fixingAbility<StandardValues.MAX_USER_FIXING_ABILITY-fixingIncreasePerUpdate){
 			fixingAbility+=fixingIncreasePerUpdate;
 		}else{
