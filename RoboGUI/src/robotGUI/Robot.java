@@ -29,7 +29,8 @@ public class Robot extends Occupant {
 
 	// behavior
 	private float			intelligence;
-
+	public static final float[] intelligences = {1.0f, 0.95f, 0.9f, 0.8f, 0.5f, 0.4f};
+	
 	// goals
 	private Cell			curGoal;
 	private Stack<astarCell>			path;

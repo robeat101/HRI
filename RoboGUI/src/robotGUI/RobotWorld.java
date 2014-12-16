@@ -16,6 +16,7 @@ public class RobotWorld {
 	//robots
 	private int nRobots = Robot.nPossibleRobotColors;
 	private Robot[] robots;
+	private boolean[] usedIntelligences;
 	
 	//obstacles
 	private int nObstacles = 30;
@@ -45,6 +46,11 @@ public class RobotWorld {
 		
 		//make user
 		user = new User();
+		
+		usedIntelligences = new boolean[nRobots];
+		for (int i=0;i<nRobots;i++){
+			usedIntelligences[i]=false;
+		}
 		
 		//make robots and add them to the grid
 		grid = new Occupant[cols][rows];
@@ -115,12 +121,21 @@ public class RobotWorld {
 		user.update(this);
 	}
 	
+	private float getUnusedIntelligence(){
+		Random r = new Random();
+		int i = r.nextInt(nRobots);
+		while(usedIntelligences[i]){
+			i = r.nextInt(nRobots);
+		}
+		usedIntelligences[i] = true;
+		return Robot.intelligences[i];
+	}
 	private Robot makeRandomRobot(int id){
 		Random rn = new Random();
 		
 		Cell randPos = getRandomUnoccupiedCell();	//make a random unoccupied position
 		
-		float intelligence = (float)(1.0f-Math.pow(rn.nextFloat(), StandardValues.INTELLIGENEPOWERCURVE));	//make a random intelligence
+		float intelligence = getUnusedIntelligence();//(float)(1.0f-Math.pow(rn.nextFloat(), StandardValues.INTELLIGENEPOWERCURVE));	//make a random intelligence
 		int theta = rn.nextInt(3)*StandardValues.VALID_HEADING_STEP;				//make a random rotation theta
 		
 		//create the robot
