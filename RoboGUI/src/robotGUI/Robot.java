@@ -45,6 +45,7 @@ public class Robot extends Occupant {
 
 	// status
 	private status			robotStatus;
+	private int waitingStateIncrementor = 0;
 	
 	TransparentRotatedImage	img;
 	private int renderY;
@@ -107,7 +108,7 @@ public class Robot extends Occupant {
 		if (turnStatus != status.LEFT && turnStatus!=status.RIGHT){
 			System.out.println("ERROR: turnRobot() called when robot wasn't turning!");
 		}
-		robotStatus = status.WAITING;
+		//robotStatus = status.WAITING;
 		setStatusToGetToNextPathCell();
 	}
 
@@ -155,7 +156,6 @@ public class Robot extends Occupant {
 	public void moveRobot(RobotWorld world) throws InvalidHeadingException
 	{
 		System.out.println("\tMoving Robot " + robotStatus.toString());
-
 		if (Math.abs(theta % StandardValues.VALID_HEADING_STEP) > 5.0f)	//if the robot is not facing a cardinal direction within some small threshold
 		{
 			throw new InvalidHeadingException("Cannot move robot when theta is " + theta + ".");
@@ -192,6 +192,7 @@ public class Robot extends Occupant {
 					// actually move ourselves
 					this.pos.setCol(newCol);
 					this.pos.setRow(newRow);
+					waitingStateIncrementor = 0;			//we tried to move and we did, so we're obviously not waiting around.
 
 					// recalculate the place we will be drawn
 					recalcRenderPosition(world);
@@ -214,6 +215,7 @@ public class Robot extends Occupant {
 						obstacleEncountered(world);
 					}else{ //hit another robot
 						this.robotStatus = status.WAITING;
+						waitingStateIncrementor = 1;
 					}
 				}
 			} else { // robot reached a wall
@@ -226,6 +228,7 @@ public class Robot extends Occupant {
 	private void reachedGoal(RobotWorld world){
 		System.out.println("Robot " + this.ID + " at "+this.pos.toString()+" reached its goal "+this.curGoal.toString()+"!");
 		robotStatus = status.WAITING;
+		waitingStateIncrementor = 1;
 		//TODO: check that the robot actually did reach its goal.
 		//TODO: give points!
 		//TODO: get a new goal from the world!
@@ -237,6 +240,7 @@ public class Robot extends Occupant {
 			this.Astar(world);
 		}catch(noPathFoundException e){
 			this.robotStatus = status.WAITING;
+			waitingStateIncrementor = 1;
 		}
 	}
 	
@@ -326,6 +330,7 @@ public class Robot extends Occupant {
 		{
 			System.out.println("REACHED GOAL!!");
 			this.robotStatus = status.REACHEDGOAL;
+			robotStatus = status.WAITING;
 		}
 		else
 		{
@@ -363,6 +368,12 @@ public class Robot extends Occupant {
 		} else if (robotStatus == status.WAITING)
 		{
 			System.out.println("...robot waiting...");
+			waitingStateIncrementor ++;
+			if (waitingStateIncrementor %2 == 0){
+				robotStatus = status.LEFT; //spin while we wait
+			}else{
+				robotStatus = status.FORWARD; //then try to go foreward after we spin
+			}
 		}
 		else if(robotStatus == status.REACHEDGOAL)
 		{
@@ -375,17 +386,22 @@ public class Robot extends Occupant {
 		if (robotStatus == status.FORWARD || robotStatus == status.BACKWARD)
 		{
 			int directionSign = (robotStatus == status.FORWARD) ? 1 : -1;
+
 			int dx = directionSign
 					* (int) Math.round(StandardValues.DELTA_POS
 							* Math.cos(Math.toRadians(theta)));
 			int dy = directionSign
 					* (int) Math.round(StandardValues.DELTA_POS
 							* Math.sin(Math.toRadians(theta)));
-			int x = Math.round((this.pos.getCol() + amount * dx)
-					* world.getColSpace());
-			int y = Math.round((this.pos.getRow() + amount * dy)
-					* world.getRowSpace());
-			this.img.setPosition(x, y);
+			
+			//only interpolate into unoccupied cells.
+			if (world.grid[this.pos.getCol()+dx][this.pos.getRow()+dy] == null){
+				int x = Math.round((this.pos.getCol() + amount * dx)
+						* world.getColSpace());
+				int y = Math.round((this.pos.getRow() + amount * dy)
+						* world.getRowSpace());
+				this.img.setPosition(x, y);
+			}
 		} else if (robotStatus == status.LEFT || robotStatus == status.RIGHT)
 		{
 			int directionSign = (robotStatus == status.RIGHT) ? 1 : -1;
