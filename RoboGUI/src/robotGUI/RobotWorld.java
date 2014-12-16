@@ -2,7 +2,6 @@ package robotGUI;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.util.Random;
 
 import robotGenericValues.StandardValues;
@@ -99,16 +98,6 @@ public class RobotWorld {
 			robots[i].interpolateRobot(this, amount);
 		}
 		user.update(this);
-	}
-	
-	//ensure a robot doesn't try to get the same goal as another robot
-	private boolean isAUsedGoal(Cell g, int curMaxRobots){
-		for (int r=0;r<curMaxRobots;r++){
-			if (robots[r].getGoal().getCol() == g.getCol() && robots[r].getGoal().getRow() == g.getRow()){
-				return true;
-			}
-		}
-		return false;
 	}
 	
 	private Robot makeRandomRobot(int id){
