@@ -84,7 +84,7 @@ public class RobotWorld {
 	
 	public void interpolate(float amount){
 		interpolateRobots(amount);
-		user.update();
+		user.update(this);
 	}
 	
 	private void updateRobots(){
@@ -98,7 +98,7 @@ public class RobotWorld {
 		for (int i=0;i<nRobots;i++){
 			robots[i].interpolateRobot(this, amount);
 		}
-		user.update();
+		user.update(this);
 	}
 	
 	//ensure a robot doesn't try to get the same goal as another robot
