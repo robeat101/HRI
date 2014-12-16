@@ -9,7 +9,8 @@ import robotGenericValues.StandardValues;
 public class User {
 	float fixingAbility = StandardValues.MAX_USER_FIXING_ABILITY;
 	float fixingIncreasePerUpdate = 0.1f;
-	JProgressBar indicator;
+	JProgressBar fixIndicator;
+	ScoreLabel scoreIndicator;
 	
 	public void update() {
 		if (fixingAbility<StandardValues.MAX_USER_FIXING_ABILITY-fixingIncreasePerUpdate){
@@ -17,9 +18,9 @@ public class User {
 		}else{
 			fixingAbility=StandardValues.MAX_USER_FIXING_ABILITY;
 		}
-		indicator.setValue((int)(fixingAbility*indicator.getMaximum()/StandardValues.MAX_USER_FIXING_ABILITY));
-		indicator.setForeground(fixingAbility>=StandardValues.COST_TO_FIX_ROBOT?Color.GREEN:Color.RED);
-		indicator.repaint();
+		fixIndicator.setValue((int)(fixingAbility*fixIndicator.getMaximum()/StandardValues.MAX_USER_FIXING_ABILITY));
+		fixIndicator.setForeground(fixingAbility>=StandardValues.COST_TO_FIX_ROBOT?Color.GREEN:Color.RED);
+		fixIndicator.repaint();
 	}
 
 	public void fixRobot(Robot curOccupant, RobotWorld world) {
@@ -30,8 +31,10 @@ public class User {
 	}
 
 
-	public void setindicator(JProgressBar ind) {
-		this.indicator=ind;
+	public void setIndicators(JProgressBar fixInd, ScoreLabel scoreInd) {
+		this.fixIndicator=fixInd;
+		this.scoreIndicator = scoreInd;
+		this.scoreIndicator.setScore(1);
 	}
 
 }

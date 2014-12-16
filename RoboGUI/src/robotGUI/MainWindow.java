@@ -96,6 +96,10 @@ public class MainWindow{
 		rechargeIndicator.setValue(rechargeIndicator.getMaximum());
 		frame.getContentPane().add(rechargeIndicator, BorderLayout.EAST);
 		
+		ScoreLabel scoreIndicator = new ScoreLabel();
+		scoreIndicator.setMinimumSize(new Dimension(scoreIndicator.getMinimumSize().width, 500));
+		frame.getContentPane().add(scoreIndicator, BorderLayout.NORTH);
+		
 		/*
 		JLabel lblHello = new JLabel("Hello, welcome to robot world");
 		frame.getContentPane().add(lblHello, BorderLayout.NORTH);
@@ -117,8 +121,7 @@ public class MainWindow{
 		frame.setResizable(false);
 		frame.pack();
 		frame.setVisible(true);
-		overheadViewPanel.setUserIndicator(rechargeIndicator);
-
+		overheadViewPanel.setUserIndicators(rechargeIndicator, scoreIndicator);
 	}
 	
 }

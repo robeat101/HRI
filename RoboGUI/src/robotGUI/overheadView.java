@@ -54,10 +54,10 @@ public class overheadView extends JPanel implements MouseListener{
 		addMouseListener(this);
 	}
 	
-	public void setUserIndicator(JProgressBar indicator){
-		this.world.user.setindicator(indicator);
+	public void setUserIndicators(JProgressBar FixIndicator, ScoreLabel ScoreIndicator){
+		this.world.user.setIndicators(FixIndicator, ScoreIndicator);
 	}
-	
+
 	private void doDrawing(Graphics g) {
         
         //draw RobotWorld
@@ -89,5 +89,6 @@ public class overheadView extends JPanel implements MouseListener{
 	@Override
 	public void mousePressed(MouseEvent e){}
 	@Override
-	public void mouseReleased(MouseEvent e){}    
+	public void mouseReleased(MouseEvent e){}
+	 
 }
