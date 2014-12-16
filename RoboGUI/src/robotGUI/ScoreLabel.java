@@ -8,11 +8,12 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
 
+@SuppressWarnings("serial")
 public class ScoreLabel extends JLabel {
 
 	public ScoreLabel(){
 		super();
-		Font f = new Font("OCR Extended", Font.BOLD, 500);
+		Font f = new Font("OCR Extended", Font.BOLD, 20);
 		this.setOpaque(true);
 		this.setSize(this.getWidth(), 500);
 		this.setBackground(Color.DARK_GRAY);
@@ -24,6 +25,7 @@ public class ScoreLabel extends JLabel {
 		this.setMinimumSize(size);
 		this.setPreferredSize(size);
 		this.setSize(size);
+		this.setFont(f);
 		//this.setVerticalAlignment(SwingConstants.CENTER);
 	}
 	

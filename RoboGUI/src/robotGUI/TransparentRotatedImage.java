@@ -1,7 +1,5 @@
 package robotGUI;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -12,6 +10,7 @@ import java.awt.geom.NoninvertibleTransformException;
 
 import javax.swing.JPanel;
 
+@SuppressWarnings("serial")
 public class TransparentRotatedImage extends JPanel {
 	private final Image image;
     private double rotation;
@@ -42,7 +41,8 @@ public class TransparentRotatedImage extends JPanel {
     protected void recalcTransformation() {
     	try {
             AffineTransform translateInstance = AffineTransform.getTranslateInstance(renderPosition.x+image.getWidth(this) / 2, renderPosition.y+image.getWidth(this) / 2);//image.getWidth(this) / 2, image.getWidth(this) / 2);
-            AffineTransform inverse = translateInstance.createInverse();
+            @SuppressWarnings("unused")
+			AffineTransform inverse = translateInstance.createInverse();
             AffineTransform rotateInstance = AffineTransform.getRotateInstance(Math.toRadians(rotation));
             //AffineTransform at = translateInstance;
             
