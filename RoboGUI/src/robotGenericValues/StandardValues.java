@@ -16,8 +16,9 @@ public class StandardValues {
 	public final static float EAST_THETA = 0.0f;
 	public final static float WEST_THETA = 180.0f;
 	
-	
 	public final static float SCORE_STEP_VALUE = 1;
 	public final static float SCORE_GOAL_VALUE = 10;
+	
+	public static final float INTELLIGENEPOWERCURVE = 4.0f;
 	
 }

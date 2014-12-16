@@ -45,7 +45,9 @@ public class Robot extends Occupant {
 	private int renderX;
 	private int renderGoalX;
 	private int renderGoalY;
-
+	private int renderAlertX;
+	private int renderAlertY;
+	
 	//robot colors
 	private final static String[] possibleRobotColors = {"RED", "BLUE", "GREEN", "YELLOW", "ORANGE", "VIOLET"};
 	private final static Color[] correspondingGoalColors = {Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, new Color(255,99,0), Color.MAGENTA};
@@ -53,6 +55,7 @@ public class Robot extends Occupant {
 	
 	//goal
 	private static final int GOAL_WIDTH = 20;
+	private static final int ALERT_WIDTH = 30;
 	
 	public void setNewGoal(RobotWorld world){
 		this.curGoal = world.getRandomUnoccupiedCell();
@@ -189,9 +192,12 @@ public class Robot extends Occupant {
 					if (!this.path.isEmpty()){
 						Cell nextPathCell = this.path.peek().getPos();
 						if (pos.getCol() == nextPathCell.getCol() && pos.getRow() == nextPathCell.getRow()){
-							this.path.pop(); //NOT we can pop this path cell from the path since we just got to it
-						}else{
+							this.path.pop(); //NOTE we can pop this path cell from the path since we just got to it
+						
+							
+						}else{ //robot must have gotten confused and moved off it's path. make a new path.
 							System.out.println(" ERROR: Robot moved to a cell "+this.pos.toString()+" that was not it's next path cell"+nextPathCell.toString()+".");
+							this.followNewPath(world);
 						}
 					}else{
 						System.out.println("ERROR: Robot moved but the path was empty.");
@@ -251,17 +257,27 @@ public class Robot extends Occupant {
 	private void doSomethingRandom(){
 		//random movements!
 		Random rand = new Random();
-		int randStatusInt = rand.nextInt(3);
-		switch(randStatusInt){
-			case 0:
-				robotStatus= status.FORWARD;
-				break;
-			case 1:
-				robotStatus = status.LEFT;
-				break;
-			case 2:
-				robotStatus = status.RIGHT;
-				break;
+		int randStatusInt;
+		status originalStatus = this.robotStatus;
+		while (this.robotStatus != originalStatus){
+			randStatusInt = rand.nextInt(5);
+			switch(randStatusInt){
+				case 0:
+					robotStatus= status.FORWARD;
+					break;
+				case 1:
+					robotStatus = status.LEFT;
+					break;
+				case 2:
+					robotStatus = status.RIGHT;
+					break;
+				case 3:
+					robotStatus = status.BACKWARD;
+					break;
+				case 4:
+					robotStatus = status.WAITING;
+					break;
+			}
 		}
 	}
 	
@@ -280,11 +296,10 @@ public class Robot extends Occupant {
 			System.out.println("\t\tRobot must go Left " + colDiff + " and down " + rowDiff + ".");
 			
 			//Error checking
-			if (Math.abs(colDiff) > 1 || Math.abs(rowDiff) > 1){
+			if ((Math.abs(colDiff) > 1 || Math.abs(rowDiff) > 1) || (colDiff!=0 && rowDiff !=0)){
 				System.out.println("ERROR: next path cell is not neightbor" +  this.pos.toString() + " to " + nextPathCell.toString());
-			}
-			if (colDiff!=0 && rowDiff !=0){
 				System.out.println("ERROR: next path cell is not cardinal:" + this.pos.toString() + " to " + nextPathCell.toString());
+				robotStatus = status.OFFPATH;
 			}
 			
 			// Direction logic			
@@ -335,15 +350,22 @@ public class Robot extends Occupant {
 	
 	public void updateRobot(RobotWorld world)
 	{		
-		
 		if(curGoal.equals(pos))
 		{
 			this.reachedGoal(world);
 		}
+		
+		// confuse the unintelligent!
+		Random confusion = new Random();
+		if (confusion.nextFloat() >= intelligence){ //the greater the intelligence, the less the probability of confusion
+			this.robotStatus = status.CONFUSED;
+			System.out.println("Robot " + this.ID + " got confused!");
+			//this.doSomethingRandom(); //make a random status
+		}
+				
 		System.out.println("Updating robot now at "+this.pos.toString()+" facing "+getAngleAsString()+"...");
 		// Execute robot status!
-		if (robotStatus == status.FORWARD || robotStatus == status.BACKWARD)
-		{
+		if (robotStatus == status.FORWARD || robotStatus == status.BACKWARD){
 			try
 			{
 				moveRobot(world);
@@ -351,11 +373,9 @@ public class Robot extends Occupant {
 			{
 				e.printStackTrace();
 			}
-		} else if (robotStatus == status.LEFT || robotStatus == status.RIGHT)
-		{
+		}else if (robotStatus == status.LEFT || robotStatus == status.RIGHT){
 			turnRobot(robotStatus);
-		} else if (robotStatus == status.WAITING)
-		{
+		}else if (robotStatus == status.WAITING){
 			System.out.println("...robot waiting...");
 		}else if (robotStatus == status.COLLISION){
 			followNewPath(world);
@@ -547,10 +567,9 @@ public class Robot extends Occupant {
 
 	public void draw(Graphics g)
 	{
-
 		//Draw goal
 		Graphics2D g2d = (Graphics2D)g;
-
+		
 		// Assume x, y, and diameter are instance variables.
 		Ellipse2D.Double circle = new Ellipse2D.Double(this.renderGoalX, this.renderGoalY, GOAL_WIDTH, GOAL_WIDTH);
 		g2d.setColor(correspondingGoalColors[this.ID]);
@@ -558,13 +577,31 @@ public class Robot extends Occupant {
 		g2d.draw(circle);
 		// System.out.println("\tDrawing Robot at "+this.pos.toString()+", "+theta+"deg)");
 		img.paintComponent(g);
-
+		
+		//draw alert if we're confused
+		if (robotStatus == status.CONFUSED){
+			
+			Point thisRobotsRenderPosition = this.img.getRenderPosition();
+			double alertX= thisRobotsRenderPosition.getX()-ALERT_WIDTH/2.0f+RobotWorld.getCellWidth()/2.0f;
+			double alertY = thisRobotsRenderPosition.getY()-ALERT_WIDTH/2.0f+RobotWorld.getCellHeight()/2.0f;
+			circle = new Ellipse2D.Double(alertX, alertY, ALERT_WIDTH, ALERT_WIDTH);
+			g2d.setColor(Color.BLACK);
+			g2d.fill(circle);
+			g2d.draw(circle);
+			
+			g2d.setColor(Color.YELLOW);
+			char[] strAlert = {'!'};
+			final int charOffsetX = 15;
+			final int charOffsetY = 20;
+			g2d.drawChars(strAlert, 0, 1, (int)Math.round(alertX)+charOffsetX, (int)Math.round(alertY)+charOffsetY);
+		}
 	}
 	
 	public void fix(RobotWorld world){
 		this.setNewGoal(world);
 		//TODO: the user clicked on this robot to fix it. Fix it
 		System.out.println("Robot "+ this.ID + " fixed!");
+		this.followNewPath(world); //find a new way to get there!
 		DataLogger.getDataLogger().log("Robot " + this.ID + " fixed, score:" + this.score, SimTimer.getCurTime());
 	}
 	

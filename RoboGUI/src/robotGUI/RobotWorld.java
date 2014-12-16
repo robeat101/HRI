@@ -2,12 +2,14 @@ package robotGUI;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.util.Random;
 
 import robotGenericValues.StandardValues;
 
 public class RobotWorld {
 
+	
 	//users
 	User user;
 	
@@ -56,6 +58,8 @@ public class RobotWorld {
 		makeRobots();
 		
 		DataLogger.initDataLogger();
+		
+		theWorld = this;
 	}
 	
 	private void makeRobots(){
@@ -66,6 +70,17 @@ public class RobotWorld {
 			robots[i] = makeRandomRobot(i);
 		}
 	}
+	
+	
+	//HACK
+	private static RobotWorld theWorld;
+	public static float getCellWidth(){
+		return theWorld.colSpace;
+	}
+	public static float getCellHeight(){
+		return theWorld.rowSpace;
+	}
+	
 	
 	private void makeObstacles(){
 		//nObstacles = 15;
@@ -104,7 +119,8 @@ public class RobotWorld {
 		Random rn = new Random();
 		
 		Cell randPos = getRandomUnoccupiedCell();	//make a random unoccupied position
-		float intelligence = rn.nextFloat();		//make a random intelligence
+		
+		float intelligence = (float)(1.0f-Math.pow(rn.nextFloat(), StandardValues.INTELLIGENEPOWERCURVE));	//make a random intelligence
 		int theta = rn.nextInt(3)*StandardValues.VALID_HEADING_STEP;				//make a random rotation theta
 		
 		//create the robot

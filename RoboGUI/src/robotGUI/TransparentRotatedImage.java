@@ -17,6 +17,10 @@ public class TransparentRotatedImage extends JPanel {
     private AffineTransform curTransform;
     private Point renderPosition;
     
+    public Point getRenderPosition(){
+    	return this.renderPosition;
+    }
+    
     public TransparentRotatedImage(Image image, Dimension d, int rot, Point position) {
         this.image = image.getScaledInstance(d.width,d.height, Image.SCALE_SMOOTH);
         setOpaque(false);
