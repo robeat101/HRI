@@ -78,7 +78,7 @@ public class DataLogger {
 	
 	public void log(String info, long time){
 		try{
-			String log = info+"\tt"+Long.toString(SimTimer.getCurTime());
+			String log = Long.toString(SimTimer.getCurTime())+": "+info;
 //			System.out.println("Writing '"+log+"' to log file");
 					
 			logFileWriter.write(log);

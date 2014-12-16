@@ -14,7 +14,8 @@ public class RobotWorld {
 	User user;
 	
 	//robots
-	private int nRobots = Robot.nPossibleRobotColors;
+	private int maxNRobots = 4;
+	private int nRobots = Math.max(maxNRobots, Robot.nPossibleRobotColors);
 	private Robot[] robots;
 	private boolean[] usedIntelligences;
 	
@@ -121,25 +122,15 @@ public class RobotWorld {
 		user.update(this);
 	}
 	
-	private float getUnusedIntelligence(){
-		Random r = new Random();
-		int i = r.nextInt(nRobots);
-		while(usedIntelligences[i]){
-			i = r.nextInt(nRobots);
-		}
-		usedIntelligences[i] = true;
-		return Robot.intelligences[i];
-	}
 	private Robot makeRandomRobot(int id){
 		Random rn = new Random();
 		
 		Cell randPos = getRandomUnoccupiedCell();	//make a random unoccupied position
 		
-		float intelligence = getUnusedIntelligence();//(float)(1.0f-Math.pow(rn.nextFloat(), StandardValues.INTELLIGENEPOWERCURVE));	//make a random intelligence
 		int theta = rn.nextInt(3)*StandardValues.VALID_HEADING_STEP;				//make a random rotation theta
 		
 		//create the robot
-		Robot robot =  new Robot(randPos,theta, intelligence, id, this);
+		Robot robot =  new Robot(randPos,theta, id, this);
 		robot.setNewGoal(this);
 		return robot;
 	}

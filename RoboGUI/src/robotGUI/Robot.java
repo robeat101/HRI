@@ -23,14 +23,15 @@ import java.util.Stack;
 
 public class Robot extends Occupant {
 	private int				ID;
-
+	private int 			colorId;
+	
 	// position, orientation
 	private float			theta;
 
 	// behavior
 	private float			intelligence;
-	public static final float[] intelligences = {1.0f, 0.95f, 0.9f, 0.8f, 0.5f, 0.4f};
-	private static final float addedIntelligenceFromFix = 1.00f;
+	public static final float[] intelligences = {1.0f, 0.99f, 0.95f, 0.5f, 0.4f, 0.1f};
+	private static final float addedIntelligenceFromFix = 0.5f;
 	private static final float intelligenceDecayPerStep = 0.25f;
 	private float intelligenceAdder = 0.0f;
 	
@@ -55,6 +56,7 @@ public class Robot extends Occupant {
 	//robot colors
 	private final static String[] possibleRobotColors = {"RED", "BLUE", "GREEN", "YELLOW", "ORANGE", "VIOLET"};
 	private final static Color[] correspondingGoalColors = {Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, new Color(255,99,0), Color.MAGENTA};
+	private static boolean[] colorIDsUsed = {false, false, false, false, false, false};
 	public final static int nPossibleRobotColors = possibleRobotColors.length;
 	
 	//debug
@@ -78,12 +80,12 @@ public class Robot extends Occupant {
 
 	}
 	
-	public Robot(Cell c, int theta, float intelligence, int id,
+	public Robot(Cell c, int theta, int id,
 			RobotWorld world)
 	{
 		super(c, world);
 		this.theta = theta;
-		this.intelligence = intelligence;
+		this.intelligence = intelligences[id];
 		this.robotStatus = status.WAITING;
 		this.ID = id;
 		if(VERBOSE){
@@ -92,10 +94,11 @@ public class Robot extends Occupant {
 				+ intelligence + ".");
 		}
 
+		this.colorId = getRandomUnusedColorID();
 		try
 		{
 			img = new TransparentRotatedImage(ImageIO.read(new File(
-					"images/robot_"+possibleRobotColors[id]+".png")), new Dimension(Math.round(world
+					"images/robot_"+possibleRobotColors[this.colorId]+".png")), new Dimension(Math.round(world
 					.getColSpace()), Math.round(world.getRowSpace())), theta,
 					c.toPoint(world));
 		} catch (IOException e1)
@@ -103,6 +106,16 @@ public class Robot extends Occupant {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+	}
+
+	private int getRandomUnusedColorID() {
+		Random rand = new Random();
+		int id = rand.nextInt(nPossibleRobotColors);
+		while (colorIDsUsed[id]){
+			id = rand.nextInt(nPossibleRobotColors);
+		}
+		colorIDsUsed[id]=true;
+		return id;
 	}
 
 	//Turns the robot 90 degrees relative to its current rotation depending on the turn status
@@ -594,7 +607,7 @@ public class Robot extends Occupant {
 		
 		// Assume x, y, and diameter are instance variables.
 		Ellipse2D.Double circle = new Ellipse2D.Double(this.renderGoalX, this.renderGoalY, GOAL_WIDTH, GOAL_WIDTH);
-		g2d.setColor(correspondingGoalColors[this.ID]);
+		g2d.setColor(correspondingGoalColors[this.colorId]);
 		g2d.fill(circle);
 		g2d.draw(circle);
 		// System.out.println("\tDrawing Robot at "+this.pos.toString()+", "+theta+"deg)");
