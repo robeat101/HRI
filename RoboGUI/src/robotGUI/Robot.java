@@ -57,13 +57,15 @@ public class Robot extends Occupant {
 	private final static Color[] correspondingGoalColors = {Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, new Color(255,99,0), Color.MAGENTA};
 	public final static int nPossibleRobotColors = possibleRobotColors.length;
 	
+	//debug
+	private final static boolean VERBOSE = false;
+	
 	//goal
 	private static final int GOAL_WIDTH = 20;
 	private static final int ALERT_WIDTH = 15;
-	
 	public void setNewGoal(RobotWorld world){
 		this.curGoal = world.getRandomUnoccupiedCell();
-		System.out.println("Setting robot " + this.ID + " goal to " + curGoal.toString());
+		if (VERBOSE){System.out.println("Setting robot " + this.ID + " goal to " + curGoal.toString());}
 		this.recalcGoalRenderPosition(world);
 		try{
 			this.Astar(world);
@@ -84,9 +86,11 @@ public class Robot extends Occupant {
 		this.intelligence = intelligence;
 		this.robotStatus = status.WAITING;
 		this.ID = id;
-		System.out.println("Making new robot "+ID+" with position (" + c.getCol()
+		if(VERBOSE){
+			System.out.println("Making new robot "+ID+" with position (" + c.getCol()
 				+ "," + c.getRow() + ") theta = " + theta + " intelligence="
 				+ intelligence + ".");
+		}
 
 		try
 		{
@@ -153,7 +157,7 @@ public class Robot extends Occupant {
 	
 	public void moveRobot(RobotWorld world) throws InvalidHeadingException
 	{
-		System.out.println("\tMoving Robot " + robotStatus.toString());
+		if (VERBOSE){System.out.println("\tMoving Robot " + robotStatus.toString());}
 		if (Math.abs(theta % StandardValues.VALID_HEADING_STEP) > 5.0f)	//if the robot is not facing a cardinal direction within some small threshold
 		{
 			throw new InvalidHeadingException("Cannot move robot when theta is " + theta + ".");
@@ -210,7 +214,7 @@ public class Robot extends Occupant {
 					setStatusToGetToNextPathCell();
 
 				} else { // another occupant is currently in the cell
-					System.out.println("Robot collision detected!");
+					if (VERBOSE){System.out.println("Robot collision detected!");}
 					if (curOccupant instanceof Obstacle){
 						obstacleEncountered(world);
 					}else{ //hit another robot
@@ -225,7 +229,7 @@ public class Robot extends Occupant {
 	}
 	
 	private void reachedGoal(RobotWorld world){
-		System.out.println("Robot " + this.ID + " at "+this.pos.toString()+" reached its goal "+this.curGoal.toString()+"!");
+		if (VERBOSE){System.out.println("Robot " + this.ID + " at "+this.pos.toString()+" reached its goal "+this.curGoal.toString()+"!");}
 		this.score += StandardValues.SCORE_GOAL_VALUE;
 		world.Score += StandardValues.SCORE_GOAL_VALUE;
 		this.robotStatus = status.REACHEDGOAL;
@@ -233,7 +237,7 @@ public class Robot extends Occupant {
 
 	//Robot tried to move into an obstacle (this should actually never happen unless the robot is being unintelligent?)
 	private void obstacleEncountered(RobotWorld world){
-		System.out.println("Robot " + this.ID + " encountered an obstacle!");
+		if (VERBOSE){System.out.println("Robot " + this.ID + " encountered an obstacle!");}
 		followNewPath(world);
 	}
 	
@@ -291,18 +295,20 @@ public class Robot extends Occupant {
 		if (!this.path.isEmpty()){
 			Cell nextPathCell = this.path.peek().getPos();
 
-			System.out.println("\tDeciding next action to get from current position " + pos.toString() +" to next path cell " + nextPathCell.toString() + "...");
+			if (VERBOSE){System.out.println("\tDeciding next action to get from current position " + pos.toString() +" to next path cell " + nextPathCell.toString() + "...");}
 			
 			//get the difference between our current position and the next cell in the path (should always be one space!)
 			int colDiff = nextPathCell.getCol() - this.pos.getCol();
 			int rowDiff = nextPathCell.getRow() - this.pos.getRow();
 			
-			System.out.println("\t\tRobot must go Left " + colDiff + " and down " + rowDiff + ".");
+			if (VERBOSE){System.out.println("\t\tRobot must go Left " + colDiff + " and down " + rowDiff + ".");}
 			
 			//Error checking
 			if ((Math.abs(colDiff) > 1 || Math.abs(rowDiff) > 1) || (colDiff!=0 && rowDiff !=0)){
-				System.out.println("ERROR: next path cell is not neightbor" +  this.pos.toString() + " to " + nextPathCell.toString());
-				System.out.println("ERROR: next path cell is not cardinal:" + this.pos.toString() + " to " + nextPathCell.toString());
+				if (VERBOSE){
+					System.out.println("ERROR: next path cell is not neightbor" +  this.pos.toString() + " to " + nextPathCell.toString());
+					System.out.println("ERROR: next path cell is not cardinal:" + this.pos.toString() + " to " + nextPathCell.toString());
+				}
 				robotStatus = status.OFFPATH;
 			}
 			
@@ -324,22 +330,22 @@ public class Robot extends Occupant {
 			//thetaToGo = normalizeAngle(thetaToGo);
 			thetaToGo = normalizeAngleNeg(thetaToGo);
 						
-			System.out.println("Robot turn " + thetaToGo + " degrees to face next path cell");
+			if (VERBOSE){System.out.println("Robot turn " + thetaToGo + " degrees to face next path cell");}
 			
 			if (Math.abs(thetaToGo) <= 45.0f && Math.abs(thetaToGo) >= -45.0f){ //close enough
 			
 				robotStatus = status.FORWARD;
-				System.out.println("Setting "+robotStatus.toString() + " to get to from "+this.pos.toString() +" to next path cell " + nextPathCell.toString());
+				if (VERBOSE){System.out.println("Setting "+robotStatus.toString() + " to get to from "+this.pos.toString() +" to next path cell " + nextPathCell.toString());}
 
 				//snap theta to nearest standard value
 				setRotation((float)(StandardValues.VALID_HEADING_STEP*((int)(theta+0.5*StandardValues.VALID_HEADING_STEP)/StandardValues.VALID_HEADING_STEP)));
 			}else{
 				robotStatus = (thetaToGo < -45.0f) ? status.RIGHT : status.LEFT;
-				System.out.println("Turning robot "+robotStatus.toString() + " to get to from "+this.pos.toString() +" facing " +getAngleAsString()+ " to next path cell " + nextPathCell.toString());
+				if (VERBOSE){System.out.println("Turning robot "+robotStatus.toString() + " to get to from "+this.pos.toString() +" facing " +getAngleAsString()+ " to next path cell " + nextPathCell.toString());}
 			}
 		}else if(curGoal.getCol() == pos.getCol() && curGoal.getRow() == pos.getRow())
 		{
-			System.out.println("REACHED GOAL!!");
+			if (VERBOSE){System.out.println("REACHED GOAL!!");}
 			this.robotStatus = status.REACHEDGOAL;
 		}
 		else
@@ -363,7 +369,7 @@ public class Robot extends Occupant {
 		
 
 		//update on this timestep to complete the current move and determine the next one.		
-		System.out.println("Updating robot now at "+this.pos.toString()+" facing "+getAngleAsString()+"...");
+		if (VERBOSE){System.out.println("Updating robot now at "+this.pos.toString()+" facing "+getAngleAsString()+"...");}
 		// Execute robot status!
 		if (robotStatus == status.FORWARD || robotStatus == status.BACKWARD){
 			try
@@ -391,7 +397,7 @@ public class Robot extends Occupant {
 		Random confusion = new Random();
 		if (confusion.nextFloat() >= intelligence + intelligenceAdder){ //the greater the intelligence, the less the probability of confusion
 			this.robotStatus = status.CONFUSED;
-			System.out.println("Robot " + this.ID + " got confused!");
+			if (VERBOSE){System.out.println("Robot " + this.ID + " got confused!");}
 			//this.doSomethingRandom(); //make a random status
 		}
 		
@@ -473,7 +479,7 @@ public class Robot extends Occupant {
 		{
 			throw new noPathFoundException(); 
 		}else{
-			System.out.println("\tA* found path from current posititon " + this.pos + " to goal " + this.curGoal + "\n" + ListOfAStarCellsToString(this.path));
+			if (VERBOSE){System.out.println("\tA* found path from current posititon " + this.pos + " to goal " + this.curGoal + "\n" + ListOfAStarCellsToString(this.path));}
 		}
 
 	}
@@ -620,7 +626,7 @@ public class Robot extends Occupant {
 	public void fix(RobotWorld world){
 		//this.setNewGoal(world);
 		intelligenceAdder = addedIntelligenceFromFix;
-		System.out.println("Robot "+ this.ID + " fixed!");
+		if (VERBOSE){System.out.println("Robot "+ this.ID + " fixed!");}
 		this.followNewPath(world); //find a new way to get there!
 		DataLogger.getDataLogger().log("Robot " + this.ID + " fixed, score:" + this.score, SimTimer.getCurTime());
 	}
