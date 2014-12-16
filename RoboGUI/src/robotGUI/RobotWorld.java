@@ -45,6 +45,9 @@ public class RobotWorld {
 		System.out.println("Making RobotWorld of "+cols+"X"+rows+" cells each size "+colSpace+"x"+rowSpace+".");
 		Score = 0;
 		
+		
+		DataLogger.initDataLogger();
+		
 		//make user
 		user = new User();
 		
@@ -63,9 +66,9 @@ public class RobotWorld {
 		
 		makeObstacles();
 		makeRobots();
+
 		
-		DataLogger.initDataLogger();
-		
+		DataLogger.getDataLogger().logInit("Robot world initialized with " + nRobots + " robots and " + nObstacles + " obsticles. Draw_intelligence is " + StandardValues.DRAW_INTELLIGENCE);
 		theWorld = this;
 	}
 	

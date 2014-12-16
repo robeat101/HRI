@@ -76,15 +76,21 @@ public class DataLogger {
 		}
 	}
 	
-	public void log(String info, long time){
+	public void log(String info){
+		this.logString(Long.toString(SimTimer.getCurTime())+": "+info);
+	}
+	
+	public void logInit(String info){
+		logString("INIT: " + info);
+	}
+	
+	private void logString(String s){
 		try{
-			String log = Long.toString(SimTimer.getCurTime())+": "+info;
-//			System.out.println("Writing '"+log+"' to log file");
-					
-			logFileWriter.write(log);
+			logFileWriter.write(s);
 			logFileWriter.newLine();
 		}catch(IOException e){
 			System.out.println("ERROR: could write to log file.");
 		}
 	}
+	
 }

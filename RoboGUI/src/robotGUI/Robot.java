@@ -34,7 +34,7 @@ public class Robot extends Occupant {
 	private static final float addedIntelligenceFromFix = 0.5f;
 	private static final float intelligenceDecayPerStep = 0.25f;
 	private float intelligenceAdder = 0.0f;
-	
+	private long brokeTime =0;
 	// goals
 	private Cell			curGoal;
 	private Stack<astarCell>			path;
@@ -108,6 +108,8 @@ public class Robot extends Occupant {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		
+		DataLogger.getDataLogger().logInit("Robot " + this.ID + " initialized with intelligence " + this.intelligence);
 	}
 
 	private int getRandomUnusedColorID() {
@@ -248,6 +250,7 @@ public class Robot extends Occupant {
 		this.score += StandardValues.SCORE_GOAL_VALUE;
 		world.Score += StandardValues.SCORE_GOAL_VALUE;
 		this.robotStatus = status.REACHEDGOAL;
+		DataLogger.getDataLogger().log("Robot "+this.ID+" reached goal. World Score: " + world.Score);
 	}
 
 	//Robot tried to move into an obstacle (this should actually never happen unless the robot is being unintelligent?)
@@ -380,9 +383,6 @@ public class Robot extends Occupant {
 			this.reachedGoal(world);
 		}
 		
-
-		
-
 		//update on this timestep to complete the current move and determine the next one.		
 		if (VERBOSE){System.out.println("Updating robot now at "+this.pos.toString()+" facing "+getAngleAsString()+"...");}
 		// Execute robot status!
@@ -413,7 +413,8 @@ public class Robot extends Occupant {
 		if (confusion.nextFloat() >= intelligence + intelligenceAdder){ //the greater the intelligence, the less the probability of confusion
 			this.robotStatus = status.CONFUSED;
 			if (VERBOSE){System.out.println("Robot " + this.ID + " got confused!");}
-			//this.doSomethingRandom(); //make a random status
+			DataLogger.getDataLogger().log("Robot " + this.ID + " broke.");
+			this.brokeTime=SimTimer.getCurTime();
 		}
 		
 		//decline added intelligence over time
@@ -648,7 +649,8 @@ public class Robot extends Occupant {
 		intelligenceAdder = addedIntelligenceFromFix;
 		if (VERBOSE){System.out.println("Robot "+ this.ID + " fixed!");}
 		this.followNewPath(world); //find a new way to get there!
-		DataLogger.getDataLogger().log("Robot " + this.ID + " fixed, score:" + this.score, SimTimer.getCurTime());
+		DataLogger.getDataLogger().log("Robot " + this.ID + " fixed after "+(SimTimer.getCurTime()-this.brokeTime)+" with "+this.path.size()+" cells in path to go. Mana: " + world.user.fixingAbility);
+		this.brokeTime=0;
 	}
 	
 	public Cell getGoal() {
