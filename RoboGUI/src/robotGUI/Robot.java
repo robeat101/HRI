@@ -39,7 +39,6 @@ public class Robot extends Occupant {
 
 	// status
 	private status			robotStatus;
-	private int waitingStateIncrementor = 0;
 	
 	TransparentRotatedImage	img;
 	private int renderY;
@@ -102,7 +101,6 @@ public class Robot extends Occupant {
 		if (turnStatus != status.LEFT && turnStatus!=status.RIGHT){
 			System.out.println("ERROR: turnRobot() called when robot wasn't turning!");
 		}
-		//robotStatus = status.WAITING;
 		setStatusToGetToNextPathCell();
 	}
 
@@ -118,8 +116,8 @@ public class Robot extends Occupant {
 		return angle;
 	}
 	
+	// used to determine smallest absolute equivalent turning angles
 	private float normalizeAngleNeg(float angle){
-		System.out.print("\t\tNormalizing angle to go from " + angle);
 		while (angle > 180)
 		{
 			angle -= 360.0f;
@@ -128,7 +126,6 @@ public class Robot extends Occupant {
 		{
 			angle += 360f;
 		}
-		System.out.println(" to "+angle);
 		return angle;
 	}
 	
@@ -186,7 +183,6 @@ public class Robot extends Occupant {
 					// actually move ourselves
 					this.pos.setCol(newCol);
 					this.pos.setRow(newRow);
-					waitingStateIncrementor = 0;			//we tried to move and we did, so we're obviously not waiting around.
 
 					// recalculate the place we will be drawn
 					recalcRenderPosition(world);
@@ -208,8 +204,7 @@ public class Robot extends Occupant {
 					if (curOccupant instanceof Obstacle){
 						obstacleEncountered(world);
 					}else{ //hit another robot
-						this.robotStatus = status.WAITING;
-						waitingStateIncrementor = 1;
+						this.robotStatus = status.COLLISION;
 					}
 				}
 			} else { // robot reached a wall
@@ -221,20 +216,23 @@ public class Robot extends Occupant {
 	
 	private void reachedGoal(RobotWorld world){
 		System.out.println("Robot " + this.ID + " at "+this.pos.toString()+" reached its goal "+this.curGoal.toString()+"!");
-		robotStatus = status.WAITING;
-		waitingStateIncrementor = 1;
-		//TODO: check that the robot actually did reach its goal.
-		//TODO: give points!
-		//TODO: get a new goal from the world!
+		this.score += StandardValues.SCORE_GOAL_VALUE;
+		world.Score += StandardValues.SCORE_GOAL_VALUE;
+		this.robotStatus = status.REACHEDGOAL;
 	}
 
+	//Robot tried to move into an obstacle (this should actually never happen unless the robot is being unintelligent?)
 	private void obstacleEncountered(RobotWorld world){
 		System.out.println("Robot " + this.ID + " encountered an obstacle!");
+		followNewPath(world);
+	}
+	
+	private void followNewPath(RobotWorld world){
 		try{
-			this.Astar(world);
+			this.Astar(world); //re-plan around obstacle
+			setStatusToGetToNextPathCell();
 		}catch(noPathFoundException e){
-			this.robotStatus = status.WAITING;
-			waitingStateIncrementor = 1;
+			this.robotStatus = status.COLLISION;
 		}
 	}
 	
@@ -324,7 +322,6 @@ public class Robot extends Occupant {
 		{
 			System.out.println("REACHED GOAL!!");
 			this.robotStatus = status.REACHEDGOAL;
-			robotStatus = status.WAITING;
 		}
 		else
 		{
@@ -341,9 +338,7 @@ public class Robot extends Occupant {
 		
 		if(curGoal.equals(pos))
 		{
-			this.score += StandardValues.SCORE_GOAL_VALUE;
-			world.Score += StandardValues.SCORE_GOAL_VALUE;
-			this.robotStatus = status.REACHEDGOAL;
+			this.reachedGoal(world);
 		}
 		System.out.println("Updating robot now at "+this.pos.toString()+" facing "+getAngleAsString()+"...");
 		// Execute robot status!
@@ -362,16 +357,14 @@ public class Robot extends Occupant {
 		} else if (robotStatus == status.WAITING)
 		{
 			System.out.println("...robot waiting...");
-			waitingStateIncrementor ++;
-			if (waitingStateIncrementor %2 == 0){
-				robotStatus = status.LEFT; //spin while we wait
-			}else{
-				robotStatus = status.FORWARD; //then try to go foreward after we spin
-			}
+		}else if (robotStatus == status.COLLISION){
+			followNewPath(world);
+		}else if (robotStatus == status.NOPATH){
+			setNewGoal(world); //keep rying to get new goals.
 		}
 		else if(robotStatus == status.REACHEDGOAL)
 		{
-			this.setNewGoal(world);
+			this.setNewGoal(world); //get a new goal!
 		}
 	}
 
