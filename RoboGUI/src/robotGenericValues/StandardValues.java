@@ -20,5 +20,6 @@ public class StandardValues {
 	public final static float SCORE_GOAL_VALUE = 10;
 	
 	public static final float INTELLIGENEPOWERCURVE = 4.0f;
+	public static final boolean DRAW_INTELLIGENCE = false;
 	
 }

@@ -30,7 +30,7 @@ public class Robot extends Occupant {
 
 	// behavior
 	private float			intelligence;
-	public static final float[] intelligences = {1.0f, 0.99f, 0.95f, 0.5f, 0.4f, 0.1f};
+	public static final float[] intelligences = {.95f, 0.4f, 0.9f, 0.2f, 0.8f, 0.5f};
 	private static final float addedIntelligenceFromFix = 0.5f;
 	private static final float intelligenceDecayPerStep = 0.25f;
 	private float intelligenceAdder = 0.0f;
@@ -52,6 +52,7 @@ public class Robot extends Occupant {
 	private int renderGoalY;
 	private int renderAlertX;
 	private int renderAlertY;
+	private char[] strAlert;
 	
 	//robot colors
 	private final static String[] possibleRobotColors = {"RED", "BLUE", "GREEN", "YELLOW", "ORANGE", "VIOLET"};
@@ -86,6 +87,7 @@ public class Robot extends Occupant {
 		super(c, world);
 		this.theta = theta;
 		this.intelligence = intelligences[id];
+		this.strAlert = (StandardValues.DRAW_INTELLIGENCE)?(Integer.toString((int)Math.round(this.intelligence*100)).toCharArray()):("!".toCharArray());
 		this.robotStatus = status.WAITING;
 		this.ID = id;
 		if(VERBOSE){
@@ -600,6 +602,9 @@ public class Robot extends Occupant {
 		return calc;
 	}
 
+	
+	private static final int charOffsetX = -2;
+	private static final int charOffsetY = 5;
 	public void draw(Graphics g)
 	{
 		//Draw goal
@@ -613,12 +618,13 @@ public class Robot extends Occupant {
 		// System.out.println("\tDrawing Robot at "+this.pos.toString()+", "+theta+"deg)");
 		img.paintComponent(g);
 		
+		//draw other stuff on top of the robots
+		Point thisRobotsRenderPosition = this.img.getRenderPosition();
+		double alertX= thisRobotsRenderPosition.getX()+RobotWorld.getCellWidth()/2.0f;
+		double alertY= thisRobotsRenderPosition.getY()+RobotWorld.getCellHeight()/2.0f;
+		
 		//draw alert if we're confused
 		if (robotStatus == status.CONFUSED){
-			
-			Point thisRobotsRenderPosition = this.img.getRenderPosition();
-			double alertX= thisRobotsRenderPosition.getX()+RobotWorld.getCellWidth()/2.0f;
-			double alertY = thisRobotsRenderPosition.getY()+RobotWorld.getCellHeight()/2.0f;
 			circle = new Ellipse2D.Double(alertX-ALERT_WIDTH/2.0f, alertY-ALERT_WIDTH/2.0f, ALERT_WIDTH, ALERT_WIDTH);
 			g2d.setColor(Color.BLACK);
 			g2d.fill(circle);
@@ -626,9 +632,11 @@ public class Robot extends Occupant {
 			
 			if (SimTimer.getCurTime()%2==0){
 				g2d.setColor(Color.YELLOW);
-				char[] strAlert = {'!'};
-				final int charOffsetX = 0;//15;
-				final int charOffsetY = 5;
+				g2d.drawChars(strAlert, 0, 1, (int)Math.round(alertX)+charOffsetX, (int)Math.round(alertY)+charOffsetY);
+			}
+		}else{
+			if (StandardValues.DRAW_INTELLIGENCE){
+				g2d.setColor(Color.BLACK);
 				g2d.drawChars(strAlert, 0, 1, (int)Math.round(alertX)+charOffsetX, (int)Math.round(alertY)+charOffsetY);
 			}
 		}
@@ -637,7 +645,6 @@ public class Robot extends Occupant {
 	//TODO: the user clicked on this robot to fix it. Fix it!
 	
 	public void fix(RobotWorld world){
-		//this.setNewGoal(world);
 		intelligenceAdder = addedIntelligenceFromFix;
 		if (VERBOSE){System.out.println("Robot "+ this.ID + " fixed!");}
 		this.followNewPath(world); //find a new way to get there!

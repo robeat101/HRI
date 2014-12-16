@@ -15,12 +15,12 @@ public class RobotWorld {
 	
 	//robots
 	private int maxNRobots = 4;
-	private int nRobots = Math.max(maxNRobots, Robot.nPossibleRobotColors);
+	private int nRobots = Math.min(maxNRobots, Robot.nPossibleRobotColors);
 	private Robot[] robots;
 	private boolean[] usedIntelligences;
 	
 	//obstacles
-	private int nObstacles = 30;
+	private int nObstacles = 40;
 	private Obstacle[] obstacles;
 	
 	//occupancy grid
