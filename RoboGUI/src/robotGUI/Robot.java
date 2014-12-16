@@ -410,7 +410,7 @@ public class Robot extends Occupant {
 		
 		// confuse the unintelligent (for the next timestep)!
 		Random confusion = new Random();
-		if (confusion.nextFloat() >= intelligence + intelligenceAdder){ //the greater the intelligence, the less the probability of confusion
+		if ((this.robotStatus!=status.CONFUSED) && (confusion.nextFloat() >= intelligence + intelligenceAdder)){ //the greater the intelligence, the less the probability of confusion
 			this.robotStatus = status.CONFUSED;
 			if (VERBOSE){System.out.println("Robot " + this.ID + " got confused!");}
 			DataLogger.getDataLogger().log("Robot " + this.ID + " broke.");
