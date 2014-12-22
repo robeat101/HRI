@@ -67,7 +67,7 @@ public class DataLogger {
 	}
 	
 	public void saveLog(){
-		System.out.println("Closing log file.");
+		System.out.println("Closing log file " + this.curLogFileNumber);
 		try{
 			logFileWriter.flush();
 			logFileWriter.close();

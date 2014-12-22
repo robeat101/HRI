@@ -14,7 +14,7 @@ public class RobotWorld {
 	User user;
 	
 	//robots
-	private int maxNRobots = 4;
+	private int maxNRobots = 6;
 	private int nRobots = Math.min(maxNRobots, Robot.nPossibleRobotColors);
 	private Robot[] robots;
 	private boolean[] usedIntelligences;
@@ -32,6 +32,12 @@ public class RobotWorld {
 	private float colSpace;
 	public int Score; 
 	Occupant grid[][];
+		
+	
+	public void writeFinalLog(){
+		System.out.println("Writing final data log.");
+		DataLogger.getDataLogger().log("\nSimulation Finished at FinalTime:" + SimTimer.getCurTime() + ", with FinalTime:"+this.Score);
+	}
 	
 	//private JPanel renderPanel;
 	public RobotWorld(int colSpace, int rowSpace){
@@ -90,7 +96,9 @@ public class RobotWorld {
 	public static float getCellHeight(){
 		return theWorld.rowSpace;
 	}
-	
+	public static RobotWorld getRobotWolrd(){
+		return theWorld;
+	}
 	
 	private void makeObstacles(){
 		//nObstacles = 15;
@@ -224,7 +232,11 @@ public class RobotWorld {
 		if (currOccupant != null){
 			if (currOccupant instanceof Robot){
 				user.fixRobot((Robot)currOccupant, this);
+			}else{
+//				System.out.println("User clicked on non-robot");
 			}
+		}else{
+//			System.out.println("User clicked on nothing.");
 		}
 	}
 }

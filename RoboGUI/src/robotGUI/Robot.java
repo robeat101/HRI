@@ -30,7 +30,7 @@ public class Robot extends Occupant {
 
 	// behavior
 	private float			intelligence;
-	public static final float[] intelligences = {.95f, 0.4f, 0.9f, 0.2f, 0.8f, 0.5f};
+	public static final float[] intelligences = {.99f, 0.95f, 0.9f, 0.8f, 0.7f, 0.6f};
 	private static final float addedIntelligenceFromFix = 0.5f;
 	private static final float intelligenceDecayPerStep = 0.25f;
 	private float intelligenceAdder = 0.0f;
@@ -226,10 +226,17 @@ public class Robot extends Occupant {
 						}
 					}else{
 						System.out.println("ERROR: Robot moved but the path was empty.");
-						reachedGoal(world);
+						this.setNewGoal(world);
 					}
-					setStatusToGetToNextPathCell();
-
+					
+					//apparently we must detect goal reaching at te step inwhich we move to the goal.
+					if (this.pos.equals(this.getGoal())){
+						//System.out.println("ERROR: moving robot when it reached it's goal.");
+						this.reachedGoal();
+					}else{
+						setStatusToGetToNextPathCell();
+					}
+					
 				} else { // another occupant is currently in the cell
 					if (VERBOSE){System.out.println("Robot collision detected!");}
 					if (curOccupant instanceof Obstacle){
@@ -245,12 +252,13 @@ public class Robot extends Occupant {
 		}
 	}
 	
-	private void reachedGoal(RobotWorld world){
+	private void reachedGoal(){
 		if (VERBOSE){System.out.println("Robot " + this.ID + " at "+this.pos.toString()+" reached its goal "+this.curGoal.toString()+"!");}
 		this.score += StandardValues.SCORE_GOAL_VALUE;
-		world.Score += StandardValues.SCORE_GOAL_VALUE;
+		RobotWorld.getRobotWolrd().Score += StandardValues.SCORE_GOAL_VALUE;
 		this.robotStatus = status.REACHEDGOAL;
-		DataLogger.getDataLogger().log("Robot "+this.ID+" reached goal. World Score: " + world.Score);
+		DataLogger.getDataLogger().log("Robot "+this.ID+" reached goal. RobotScore: "+this.score+", WorldScore:" + RobotWorld.getRobotWolrd().Score);
+		this.setNewGoal(RobotWorld.getRobotWolrd());
 	}
 
 	//Robot tried to move into an obstacle (this should actually never happen unless the robot is being unintelligent?)
@@ -361,10 +369,16 @@ public class Robot extends Occupant {
 				robotStatus = (thetaToGo < -45.0f) ? status.RIGHT : status.LEFT;
 				if (VERBOSE){System.out.println("Turning robot "+robotStatus.toString() + " to get to from "+this.pos.toString() +" facing " +getAngleAsString()+ " to next path cell " + nextPathCell.toString());}
 			}
-		}else if(curGoal.getCol() == pos.getCol() && curGoal.getRow() == pos.getRow())
-		{
-			if (VERBOSE){System.out.println("REACHED GOAL!!");}
-			this.robotStatus = status.REACHEDGOAL;
+		}else if(curGoal.getCol() == pos.getCol() && curGoal.getRow() == pos.getRow()){
+			if (this.robotStatus != status.REACHEDGOAL){
+				if (VERBOSE){System.out.println("REACHED GOAL!!");}
+				System.out.println("ERROR: Reached goal while setting status (not already detected?)");
+				this.reachedGoal();
+			}else{
+				System.out.println("ERROR: Reached goal while setting status?");
+				this.setNewGoal(RobotWorld.getRobotWolrd());
+			}
+			//this.robotStatus = status.REACHEDGOAL;
 		}
 		else
 		{
@@ -378,11 +392,13 @@ public class Robot extends Occupant {
 	
 	public void updateRobot(RobotWorld world)
 	{		
-		if(curGoal.equals(pos))
+	
+		if(curGoal.equals(pos) || this.pos.equals(this.curGoal))
 		{
-			this.reachedGoal(world);
+			System.out.println("ERROR: Detected goal after it was reached!");
+			this.reachedGoal();
 		}
-		
+
 		//update on this timestep to complete the current move and determine the next one.		
 		if (VERBOSE){System.out.println("Updating robot now at "+this.pos.toString()+" facing "+getAngleAsString()+"...");}
 		// Execute robot status!
@@ -413,7 +429,7 @@ public class Robot extends Occupant {
 		if ((this.robotStatus!=status.CONFUSED) && (confusion.nextFloat() >= intelligence + intelligenceAdder)){ //the greater the intelligence, the less the probability of confusion
 			this.robotStatus = status.CONFUSED;
 			if (VERBOSE){System.out.println("Robot " + this.ID + " got confused!");}
-			DataLogger.getDataLogger().log("Robot " + this.ID + " broke.");
+			//DataLogger.getDataLogger().log("Robot " + this.ID + " broke.");
 			this.brokeTime=SimTimer.getCurTime();
 		}
 		
@@ -603,7 +619,6 @@ public class Robot extends Occupant {
 		return calc;
 	}
 
-	
 	private static final int charOffsetX = -2;
 	private static final int charOffsetY = 5;
 	public void draw(Graphics g)
@@ -631,7 +646,7 @@ public class Robot extends Occupant {
 			g2d.fill(circle);
 			g2d.draw(circle);
 			
-			if (SimTimer.getCurTime()%2==0){
+			if (SimTimer.getCurTimeMillis()%2==0){
 				g2d.setColor(Color.YELLOW);
 				g2d.drawChars(strAlert, 0, 1, (int)Math.round(alertX)+charOffsetX, (int)Math.round(alertY)+charOffsetY);
 			}
@@ -649,8 +664,9 @@ public class Robot extends Occupant {
 		intelligenceAdder = addedIntelligenceFromFix;
 		if (VERBOSE){System.out.println("Robot "+ this.ID + " fixed!");}
 		this.followNewPath(world); //find a new way to get there!
-		DataLogger.getDataLogger().log("Robot " + this.ID + " fixed after "+(SimTimer.getCurTime()-this.brokeTime)+" with "+this.path.size()+" cells in path to go. Mana: " + world.user.fixingAbility);
+		DataLogger.getDataLogger().log("RobotID:" + this.ID + " after neglectTime:"+(SimTimer.getCurTime()-this.brokeTime)+", PathCellsToGo:"+((this.path==null)?"NoPath":(this.path.size()))+", UserMana: " + world.user.fixingAbility+", RobotScore: "+this.score);
 		this.brokeTime=0;
+		//System.out.println("user clicked on robot " + this.ID);
 	}
 	
 	public Cell getGoal() {

@@ -20,7 +20,7 @@ public class ScoreLabel extends JLabel {
 		this.setForeground(Color.GREEN);
 		
 		this.setHorizontalAlignment(SwingConstants.CENTER);
-		int height = 50;
+		int height = 20;
 		Dimension size = new Dimension(getSize().width, height);
 		this.setMinimumSize(size);
 		this.setPreferredSize(size);

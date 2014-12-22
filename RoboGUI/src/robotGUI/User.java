@@ -8,14 +8,13 @@ import robotGenericValues.StandardValues;
 
 public class User {
 	float fixingAbility = StandardValues.MAX_USER_FIXING_ABILITY;
-	float fixingIncreasePerUpdate = 0.1f;
 	JProgressBar fixIndicator;
 	ScoreLabel scoreIndicator;
 	
 	public void update(RobotWorld world) {
 		this.scoreIndicator.setScore(world.Score);
-		if (fixingAbility<StandardValues.MAX_USER_FIXING_ABILITY-fixingIncreasePerUpdate){
-			fixingAbility+=fixingIncreasePerUpdate;
+		if (fixingAbility<StandardValues.MAX_USER_FIXING_ABILITY-StandardValues.FIXINGINCREASEPERUPDATE){
+			fixingAbility+=StandardValues.FIXINGINCREASEPERUPDATE;
 		}else{
 			fixingAbility=StandardValues.MAX_USER_FIXING_ABILITY;
 		}

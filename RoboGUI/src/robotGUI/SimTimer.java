@@ -43,8 +43,11 @@ public class SimTimer extends Timer {
 			});
 		this.start();
 	}
-
-	public static long getCurTime(){
+	public static long getCurTimeMillis(){
 		return theSimTimer.time;
+	}
+	
+	public static long getCurTime(){
+		return theSimTimer.time/StandardValues.DELTA_TIME_INTERPOLATE;
 	}
 }

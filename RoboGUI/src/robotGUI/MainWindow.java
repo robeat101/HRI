@@ -16,7 +16,6 @@ public class MainWindow{
 	
 	private JFrame frame;
 	private overheadView overheadViewPanel;
-    
 //	private Timer timer = new Timer(StandardValues.DELTA_TIME_INTERPOLATE, new AbstractAction() {
 //        @Override
 //        public void actionPerformed(ActionEvent ae) {
@@ -50,6 +49,7 @@ public class MainWindow{
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
 			public void run() {
 				System.out.println("Shutting down");
+				RobotWorld.getRobotWolrd().writeFinalLog();
 				DataLogger.getDataLogger().saveLog();
 			}
 		}));
